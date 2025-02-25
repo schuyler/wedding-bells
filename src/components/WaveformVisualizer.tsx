@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState, type ReactElement, type RefObject } from 'react'
 import WaveSurfer from 'wavesurfer.js'
 import Record from 'wavesurfer.js/dist/plugins/record.esm.js'
 
@@ -12,7 +12,16 @@ interface WaveformVisualizerProps {
   maxDuration?: number // in seconds, default 900 (15 minutes)
 }
 
-export function WaveformVisualizer({
+export interface WaveSurferControls {
+  startRecording: () => Promise<void>
+  stopRecording: () => void
+  pauseRecording: () => void
+  resumeRecording: () => void
+}
+
+export type WaveformVisualizerRef = RefObject<WaveSurferControls>
+
+export const WaveformVisualizer = forwardRef<WaveSurferControls, WaveformVisualizerProps>(({
   onRecordingComplete,
   onRecordingStart,
   onRecordingPause,
@@ -20,7 +29,7 @@ export function WaveformVisualizer({
   onPlaybackComplete,
   className = '',
   maxDuration = 900
-}: WaveformVisualizerProps) {
+}, ref) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const wavesurfer = useRef<WaveSurfer | null>(null)
   const recordPlugin = useRef<ReturnType<typeof Record.create> | null>(null)
@@ -169,18 +178,29 @@ export function WaveformVisualizer({
     setIsPlaying(!isPlaying)
   }
 
-  // Export recording control methods
-  useEffect(() => {
-    if (wavesurfer.current && recordPlugin.current) {
-      // Attach methods to wavesurfer instance for external access
-      Object.assign(wavesurfer.current, {
-        startRecording,
-        stopRecording,
-        pauseRecording,
-        resumeRecording
-      })
+  // Expose recording controls to parent via ref
+  useImperativeHandle(ref, () => ({
+    startRecording: async () => {
+      if (recordPlugin.current && !isRecording) {
+        await recordPlugin.current.startRecording()
+      }
+    },
+    stopRecording: () => {
+      if (recordPlugin.current && isRecording) {
+        recordPlugin.current.stopRecording()
+      }
+    },
+    pauseRecording: () => {
+      if (recordPlugin.current && isRecording && !isPaused) {
+        recordPlugin.current.pauseRecording()
+      }
+    },
+    resumeRecording: () => {
+      if (recordPlugin.current && isRecording && isPaused) {
+        recordPlugin.current.resumeRecording()
+      }
     }
-  }, [])
+  }), [isRecording, isPaused])
 
   return (
     <div className={`relative ${className}`}>
@@ -261,4 +281,4 @@ export function WaveformVisualizer({
       )}
     </div>
   )
-}
+})
