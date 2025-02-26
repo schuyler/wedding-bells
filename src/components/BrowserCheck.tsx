@@ -1,55 +1,30 @@
-import { useEffect, useState } from 'react'
-import { BrowserCompatibility } from '../types'
+import { useEffect, useState } from 'react';
+import { BrowserCompatibility } from '../types';
 
 interface BrowserCheckProps {
-  onCompatibilityChange: (compatibility: BrowserCompatibility) => void
+  onCompatibilityChange: (compatibility: BrowserCompatibility) => void;
 }
 
 export function BrowserCheck({ onCompatibilityChange }: BrowserCheckProps) {
   const [compatibility, setCompatibility] = useState<BrowserCompatibility>({
     hasAudioSupport: false,
     hasMicrophonePermission: false,
-    hasWaveSurferSupport: false
-  })
+    hasWaveSurferSupport: false,
+  });
 
   useEffect(() => {
-    const checkCompatibility = async () => {
-      // Check for Web Audio API support
-      const hasAudioContext = typeof window !== 'undefined' && 
-        (window.AudioContext || (window as any).webkitAudioContext)
+    // Only check for basic audio support requirements
+    const hasAudioSupport = ('AudioContext' in window || 'webkitAudioContext' in window) && 'MediaRecorder' in window;
 
-      // Check for MediaRecorder support
-      const hasMediaRecorder = typeof window !== 'undefined' && 
-        'MediaRecorder' in window
-      
-      // Check for AudioWorklet support (needed for Wavesurfer.js)
-      const hasAudioWorklet = typeof window !== 'undefined' && 
-        'AudioWorklet' in (window.AudioContext || (window as any).webkitAudioContext).prototype
+    const newCompatibility: BrowserCompatibility = {
+      hasAudioSupport,
+      hasMicrophonePermission: false, // This will be checked later in AudioRecorder
+      hasWaveSurferSupport: hasAudioSupport, // If basic audio is supported, we can use wavesurfer
+    };
 
-      const audioSupport = hasAudioContext && hasMediaRecorder && hasAudioWorklet
-
-      // Check for existing microphone permission
-      let micPermission = false
-      try {
-        const permissions = await navigator.permissions.query({ name: 'microphone' as PermissionName })
-        micPermission = permissions.state === 'granted'
-      } catch {
-        // Permissions API not supported or other error
-        micPermission = false
-      }
-
-      const newCompatibility: BrowserCompatibility = {
-        hasAudioSupport: audioSupport,
-        hasMicrophonePermission: micPermission,
-        hasWaveSurferSupport: hasAudioContext && hasAudioWorklet
-      }
-
-      setCompatibility(newCompatibility)
-      onCompatibilityChange(newCompatibility)
-    }
-
-    checkCompatibility()
-  }, [onCompatibilityChange])
+    setCompatibility(newCompatibility);
+    onCompatibilityChange(newCompatibility);
+  }, [onCompatibilityChange]);
 
   if (!compatibility.hasAudioSupport) {
     return (
@@ -58,24 +33,12 @@ export function BrowserCheck({ onCompatibilityChange }: BrowserCheckProps) {
           Browser Not Supported
         </h3>
         <p className="mt-2 text-sm text-red-700">
-          Your browser does not support audio recording. Please try using a modern browser like Chrome, Firefox, or Safari.
+          Your browser does not support audio recording. Please try using a
+          modern browser like Chrome, Firefox, or Safari.
         </p>
       </div>
-    )
+    );
   }
 
-  if (!compatibility.hasWaveSurferSupport) {
-    return (
-      <div className="rounded-lg bg-yellow-50 p-4 border border-yellow-200">
-        <h3 className="text-lg font-medium text-yellow-800">
-          Limited Browser Support
-        </h3>
-        <p className="mt-2 text-sm text-yellow-700">
-          Your browser has limited support for audio visualization. The recording will work, but you may not see the audio waveform.
-        </p>
-      </div>
-    )
-  }
-
-  return null
+  return null;
 }

@@ -13,16 +13,50 @@ interface AudioRecorderProps {
 export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderProps) {
   const [isRecording, setIsRecording] = useState(false)
   const [isPaused, setIsPaused] = useState(false)
+  // Following the standard Web Audio API pattern:
+  // 1. Don't pre-check permissions - wait for user interaction
+  // 2. Use browser's native permission prompt when user initiates recording
+  // 3. Handle permission results in the recording flow
+  // This matches common audio app patterns and MDN examples
   const waveformRef = useRef<WaveSurferControls>(null)
   const [error, setError] = useState<Error | null>(null)
   const { currentVolume, error: volumeError, initializeAnalysis, stopAnalysis } = useAudioVolume()
+  const [isPermissionDenied, setIsPermissionDenied] = useState(false)
+
+  // Request permissions only when user starts recording
+  const requestMicrophoneAccess = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          sampleRate: 48000,
+        }
+      })
+      // Stop the stream immediately - we'll request it again when recording starts
+      stream.getTracks().forEach(track => track.stop())
+      return true
+    } catch (err) {
+      // If it's a permissions error, show the denied state
+      // Otherwise, show it as a regular error that can be retried
+      if (err instanceof Error && err.name === 'NotAllowedError') {
+        setIsPermissionDenied(true)
+      } else {
+        const error = err instanceof Error
+          ? err
+          : new Error('Failed to access microphone. Please check your settings and try again.')
+        setError(error)
+      }
+      return false
+    }
+  }
 
   // Handle recording state changes
   const handleRecordingStart = useCallback(async () => {
+    // We already have permission if we get here
     setIsRecording(true)
     setIsPaused(false)
 
-    // Get access to the microphone stream for volume analysis
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -33,10 +67,17 @@ export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderPr
       })
       initializeAnalysis(stream)
     } catch (err) {
-      const error = err instanceof Error 
-        ? err 
-        : new Error('Failed to access microphone. Please check your permissions and try again.')
-      setError(error)
+      // This should rarely happen since we already checked permissions
+      // If permissions were revoked mid-recording, show denied state
+      // Otherwise treat as a technical error
+      if (err instanceof Error && err.name === 'NotAllowedError') {
+        setIsPermissionDenied(true)
+      } else {
+        const error = err instanceof Error
+          ? err
+          : new Error('Failed to start recording. Please check your microphone and try again.')
+        setError(error)
+      }
       setIsRecording(false)
     }
   }, [initializeAnalysis])
@@ -55,7 +96,7 @@ export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderPr
 
   const handleRecordingResume = useCallback(async () => {
     setIsPaused(false)
-    // Re-initialize volume analysis
+    // When resuming, we know we already had permission, so focus error on hardware/system issues
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -66,11 +107,16 @@ export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderPr
       })
       initializeAnalysis(stream)
     } catch (err) {
-      const error = err instanceof Error 
-        ? err 
-        : new Error('Failed to resume recording. Please check your microphone and try again.')
-      setError(error)
-      setIsPaused(true)
+      // Check if permissions were revoked while paused
+      if (err instanceof Error && err.name === 'NotAllowedError') {
+        setIsPermissionDenied(true)
+      } else {
+        const error = err instanceof Error
+          ? err
+          : new Error('Unable to access microphone. Please check if another application is using it.')
+        setError(error)
+        setIsPaused(true)
+      }
     }
   }, [initializeAnalysis])
 
@@ -86,6 +132,32 @@ export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderPr
     }
   }, [volumeError])
 
+  // Early return for permission denied state to prevent layout issues
+  if (isPermissionDenied) {
+    return (
+      <div className="max-w-lg mx-auto">
+        <div className="rounded-lg bg-red-50 p-4 border border-red-200">
+          <h3 className="text-lg font-medium text-red-800">
+            Microphone Access Denied
+          </h3>
+          <p className="mt-2 text-sm text-red-700">
+            Microphone access is required for audio recording. Please check your
+            browser settings to allow microphone access for this site.
+          </p>
+          <div className="mt-4">
+            <button
+              onClick={onCancel}
+              className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Only render recording UI if permissions are not denied
   return (
     <div className="space-y-6">
       <ErrorModal
@@ -149,26 +221,30 @@ export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderPr
           />
         )}
 
-        {/* Controls */}
-        <div className="flex items-center justify-center space-x-4">
-          {!isRecording ? (
-            <>
-              <button
-                onClick={() => {
+      {/* Controls */}
+      <div className="flex items-center justify-center space-x-4">
+        {!isRecording ? (
+          <>
+            <button
+              onClick={async () => {
+                // Request permissions when user clicks to start recording
+                const hasPermission = await requestMicrophoneAccess()
+                if (hasPermission) {
                   waveformRef.current?.startRecording()
-                }}
-                className="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-6 rounded-lg transition-colors"
-              >
-                Start Recording
-              </button>
-              <button
-                onClick={onCancel}
-                className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-            </>
-          ) : (
+                }
+              }}
+              className="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-6 rounded-lg transition-colors"
+            >
+              Start Recording
+            </button>
+            <button
+              onClick={onCancel}
+              className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors"
+            >
+              Cancel
+            </button>
+          </>
+        ) : (
             <>
               <button
                 onClick={() => {

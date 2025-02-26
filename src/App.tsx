@@ -4,13 +4,19 @@ import { AudioRecorder } from './components/AudioRecorder'
 import { ProgressIndicator } from './components/ProgressIndicator'
 import { UploadProgress } from './components/UploadProgress'
 import { ThankYou } from './components/ThankYou'
-import { GuestInfo, RecordingState } from './types'
+import { BrowserCheck } from './components/BrowserCheck'
+import { GuestInfo, RecordingState, BrowserCompatibility } from './types'
 
 function App() {
   const [recordingState, setRecordingState] = useState<RecordingState>('welcome')
   const [guestInfo, setGuestInfo] = useState<GuestInfo | null>(null)
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
   const [uploadProgress, setUploadProgress] = useState(0)
+  const [browserCompatibility, setBrowserCompatibility] = useState<BrowserCompatibility>({
+    hasAudioSupport: false,
+    hasMicrophonePermission: false,
+    hasWaveSurferSupport: false
+  })
 
   const handleGuestInfo = (info: GuestInfo) => {
     setGuestInfo(info)
@@ -109,13 +115,19 @@ function App() {
           Marc & Sea's Wedding
         </h1>
         
-        <div className="space-y-4 sm:space-y-6">
-          {renderCurrentState()}
-        </div>
+        <BrowserCheck onCompatibilityChange={setBrowserCompatibility} />
+        
+        {browserCompatibility.hasAudioSupport && (
+          <>
+            <div className="space-y-4 sm:space-y-6">
+              {renderCurrentState()}
+            </div>
 
-        <div className="mt-4 sm:mt-6 md:mt-8">
-          <ProgressIndicator currentState={recordingState} />
-        </div>
+            <div className="mt-4 sm:mt-6 md:mt-8">
+              <ProgressIndicator currentState={recordingState} />
+            </div>
+          </>
+        )}
       </div>
     </main>
   )
