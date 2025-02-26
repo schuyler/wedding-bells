@@ -119,25 +119,6 @@ export function WelcomeForm({ onSubmit }: WelcomeFormProps) {
           )}
         </div>
 
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-            Email (Optional)
-          </label>
-          <input
-            type="email"
-            id="email"
-            {...register('email')}
-            disabled={isChecking || isSubmitting}
-            className={`w-full px-4 py-2 rounded-lg border ${
-              errors.email ? 'border-red-500' : 'border-gray-300'
-            } focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500`}
-            placeholder="Enter your email (optional)"
-          />
-          {errors.email && (
-            <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>
-          )}
-        </div>
-
         <button
           type="submit"
           disabled={isChecking || isSubmitting}

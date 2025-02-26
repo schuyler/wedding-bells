@@ -2,7 +2,6 @@ import { z } from 'zod'
 
 export interface GuestInfo {
   name: string
-  email?: string
 }
 
 export interface MessageMetadata {
@@ -67,8 +66,7 @@ export interface BrowserCompatibility {
 
 // Zod schemas for validation
 export const guestInfoSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters').max(100, 'Name must be less than 100 characters'),
-  email: z.string().email('Invalid email address').optional()
+  name: z.string().min(2, 'Name must be at least 2 characters').max(100, 'Name must be less than 100 characters')
 })
 
 export const recordingSchema = z.object({
