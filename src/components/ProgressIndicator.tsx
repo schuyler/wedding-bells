@@ -13,9 +13,24 @@ export function ProgressIndicator({
     <div className="flex flex-col items-center space-y-3">
       {/* Progress Steps */}
       <div className="flex items-center justify-center">
-        <div className="flex items-center space-x-2 sm:space-x-3">
+        <div className="flex items-center space-x-8 sm:space-x-14 relative">
           {states.map((state, index) => (
-            <div key={state} className="flex items-center">
+            <div key={state} className="relative">
+              {/* Connector Line */}
+              {index < states.length - 1 && (
+                <div 
+                  className={`
+                    absolute top-1/2 left-full h-0.5
+                    w-8 sm:w-14
+                    -translate-y-1/2
+                    transition-colors
+                    ${index < states.indexOf(currentState)
+                      ? 'bg-blue-500'
+                      : 'bg-gray-300'
+                    }
+                  `}
+                />
+              )}
               {/* Progress Dot */}
               <div
                 className={`
@@ -28,19 +43,6 @@ export function ProgressIndicator({
                   }
                 `}
               />
-              {/* Connector Line */}
-              {index < states.length - 1 && (
-                <div 
-                  className={`
-                    w-4 sm:w-6 h-0.5
-                    transition-colors
-                    ${index < states.indexOf(currentState)
-                      ? 'bg-blue-500'
-                      : 'bg-gray-300'
-                    }
-                  `}
-                />
-              )}
             </div>
           ))}
         </div>
