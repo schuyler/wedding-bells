@@ -49,13 +49,14 @@ export const WaveformVisualizer = forwardRef<WaveSurferControls, WaveformVisuali
       cursorColor: '#1E40AF',
       cursorWidth: 2,
       height: 128,
-      normalize: true,
+      normalize: false, // Disable normalization to prevent distracting amplitude scaling
       dragToSeek: !isRecording,
-      autoScroll: true,
+      autoScroll: true, // Ensure waveform scrolls smoothly
       hideScrollbar: true,
-      minPxPerSec: 100, // Good detail level for voice
+      minPxPerSec: 50, // Balanced zoom level for real-time display
       autoCenter: true,
-      fillParent: true
+      fillParent: true,
+      interact: false // Disable user interaction during recording
     })
 
     // Initialize record plugin
@@ -64,9 +65,9 @@ export const WaveformVisualizer = forwardRef<WaveSurferControls, WaveformVisuali
       audioBitsPerSecond: 128000, // Fixed bitrate for consistent quality
       renderRecordedAudio: true, // Show recorded audio waveform
       scrollingWaveform: true, // Show scrolling waveform while recording
-      scrollingWaveformWindow: 5, // Show last 5 seconds
-      continuousWaveform: true, // Accumulate waveform data while recording
-      mediaRecorderTimeslice: 100 // Emit data every 100ms for smooth visualization
+      scrollingWaveformWindow: 3, // Show last 3 seconds for faster updates
+      continuousWaveform: false, // Disable continuous mode to prevent slowdown
+      mediaRecorderTimeslice: 50 // Frequent updates for smooth visualization
     }))
 
     // Set up record plugin event handlers
