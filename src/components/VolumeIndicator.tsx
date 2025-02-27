@@ -21,9 +21,9 @@ export function VolumeIndicator({
     const isActive = index < activeBarCount
     if (!isActive) return 'bg-gray-200'
 
-    // Color gradient from green to yellow to red
-    if (index < bars * 0.6) return 'bg-green-500'
-    if (index < bars * 0.8) return 'bg-yellow-500'
+    // Colors: green up to 7th bar, yellow for 8th and 9th, red for 10th
+    if (index < bars - 3) return 'bg-green-500'
+    if (index < bars - 1) return 'bg-yellow-500'
     return 'bg-red-500'
   }
 

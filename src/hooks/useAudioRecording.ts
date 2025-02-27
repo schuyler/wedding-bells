@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+export interface VolumeConfig {
+  minDecibels?: number // Minimum dB level (maps to 0)
+  maxDecibels?: number // Maximum dB level (maps to 1)
+}
+
 export interface UseAudioVolume {
   currentVolume: number
   error?: Error
@@ -7,7 +12,9 @@ export interface UseAudioVolume {
   stopAnalysis: () => void
 }
 
-export function useAudioVolume(): UseAudioVolume {
+export function useAudioVolume(config: VolumeConfig = {}): UseAudioVolume {
+  const minDb = config.minDecibels ?? -30 // default: quiet room
+  const maxDb = config.maxDecibels ?? 10   // default: loud voice
   const [currentVolume, setCurrentVolume] = useState(0)
   const [error, setError] = useState<Error>()
 
@@ -58,7 +65,16 @@ export function useAudioVolume(): UseAudioVolume {
           sum += amplitude * amplitude
         }
         const rms = Math.sqrt(sum / dataArray.length)
-        setCurrentVolume(rms)
+        
+        // Convert RMS to decibels and normalize to 0-1 range
+        // Add small epsilon to prevent Math.log10(0)
+        const epsilon = 1e-10
+        const db = 20 * Math.log10(rms + epsilon)
+        // Normalize using configured dB range
+        const range = maxDb - minDb
+        const normalizedVolume = Math.max(0, Math.min(1, (db - minDb) / range))
+        
+        setCurrentVolume(normalizedVolume)
 
         animationFrame.current = requestAnimationFrame(updateVolume)
       }

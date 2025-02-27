@@ -20,7 +20,10 @@ export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderPr
   // This matches common audio app patterns and MDN examples
   const waveformRef = useRef<WaveSurferControls>(null)
   const [error, setError] = useState<Error | null>(null)
-  const { currentVolume, error: volumeError, initializeAnalysis, stopAnalysis } = useAudioVolume()
+  const { currentVolume, error: volumeError, initializeAnalysis, stopAnalysis } = useAudioVolume({
+    minDecibels: -40, // Below speaking level
+    maxDecibels: -10  // Above normal speaking level
+  })
   const [isPermissionDenied, setIsPermissionDenied] = useState(false)
 
   // Request permissions only when user starts recording
