@@ -1,61 +1,40 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { AudioRecorder } from '../components/AudioRecorder';
+import { useRecording } from '../context/RecordingContext';
 
 /**
  * Recording view component for capturing audio messages.
  * 
  * This component handles the audio recording phase of the workflow,
  * providing an interface for users to record their message.
- * It's a pure refactor from App.tsx recording state.
  * 
  * Component Flow:
  * 1. Displays audio recorder interface
- * 2. Handles recording state management
- * 3. Processes recording completion/cancellation
+ * 2. On recording completion:
+ *    - Saves audio blob to context
+ *    - Navigates to preview screen
+ * 3. On cancel:
+ *    - Resets flow to welcome screen
  * 
  * @component
  * @returns {React.ReactElement} Recording interface
- * 
- * Technical Architecture:
- * - Implements view layer of recording state
- * - Uses AudioRecorder component for capture
- * - Manages local recording state
- * - Pure presentational component (logic handled by parent)
- * 
- * State Management:
- * - Tracks recording status (active/paused)
- * - Handles recording completion
- * - Manages cancellation flow
  */
 export function RecordingView(): React.ReactElement {
-  const [_isRecording, setIsRecording] = useState(false);
-  const [_isPaused, setIsPaused] = useState(false);
+  const { setAudioBlob, goToNextStep, resetFlow } = useRecording();
 
   /**
    * Handles completion of audio recording
    * @param {Blob} blob - The recorded audio blob
-   * @sideeffect Resets recording states
    */
   const handleRecordingComplete = (blob: Blob): void => {
-    console.log('Recording complete', blob);
-    setIsRecording(false);
-    setIsPaused(false);
-  };
-
-  /**
-   * Handles cancellation of recording
-   * @sideeffect Resets recording states
-   */
-  const handleCancel = (): void => {
-    console.log('Recording cancelled');
-    setIsRecording(false);
-    setIsPaused(false);
+    setAudioBlob(blob);  // Save blob to context
+    goToNextStep();      // Navigate to preview
   };
 
   return (
     <AudioRecorder
       onRecordingComplete={handleRecordingComplete}
-      onCancel={handleCancel}
+      onCancel={resetFlow}
     />
   );
 }
