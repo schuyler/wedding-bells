@@ -6,10 +6,62 @@ import { ErrorModal } from './ErrorModal'
 import { BrowserCheck } from './BrowserCheck'
 import { LoadingSpinner } from './LoadingSpinner'
 
+/**
+ * Props interface for the WelcomeForm component.
+ * 
+ * @property onSubmit - Callback function invoked with guest information when form is successfully submitted
+ */
 interface WelcomeFormProps {
   onSubmit: (data: GuestInfo) => void
 }
 
+/**
+ * Initial entry form component for collecting guest information.
+ * 
+ * This component serves as the first step in the recording flow, gathering 
+ * essential guest information before proceeding to audio recording. It handles 
+ * form validation, microphone permission checks, and browser compatibility verification.
+ * 
+ * Implementation details:
+ * - Uses react-hook-form with Zod schema validation
+ * - Performs microphone permission checking after form submission
+ * - Shows appropriate error modals for permission issues
+ * - Conditionally renders BrowserCheck for incompatible browsers
+ * - Provides loading states during permission checks and form submission
+ * 
+ * Primary responsibilities:
+ * 1. Collect and validate guest name
+ * 2. Check browser compatibility for audio recording
+ * 3. Request microphone permissions
+ * 4. Handle various error states with appropriate user feedback
+ * 
+ * Technical concerns:
+ * - The component currently handles multiple responsibilities (form validation, 
+ *   permission checking, and browser compatibility) which violates the Single 
+ *   Responsibility Principle
+ * - Permission checking is duplicated between this component and AudioRecorder
+ * - There's confusion in the relationship with BrowserCheck components (also 
+ *   rendered in parent App component)
+ * 
+ * Improvement opportunities:
+ * 1. Separate concerns:
+ *    - Extract permission handling to a dedicated hook (e.g., useMicrophonePermission)
+ *    - Move browser compatibility checking to a higher-level component or context
+ *    - Keep WelcomeForm focused solely on form collection and validation
+ * 
+ * 2. Establish clear permission flow:
+ *    - Consider deferring microphone permission until recording actually starts
+ *    - Centralize permission state in a context to prevent duplicate checks
+ * 
+ * 3. Improve error handling:
+ *    - Create more specific error types for different scenarios
+ *    - Add more helpful guidance for resolving permission issues on different browsers
+ * 
+ * 4. Enhance accessibility:
+ *    - Add proper ARIA attributes to form elements
+ *    - Ensure keyboard navigation works correctly
+ *    - Add better focus management during errors and loading states
+ */
 export function WelcomeForm({ onSubmit }: WelcomeFormProps) {
   const [isChecking, setIsChecking] = useState(false)
   const [error, setError] = useState<{

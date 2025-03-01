@@ -1,3 +1,25 @@
+/**
+ * Progress bar component with configurable sizing and status variants.
+ * 
+ * Responsibilities:
+ * - Visual representation of progress percentage
+ * - Color coding for different status states
+ * - Responsive sizing options
+ * - Accessible progress reporting via ARIA
+ * 
+ * Implementation Notes:
+ * - Uses Tailwind transition utilities for smooth width changes
+ * - Clamps progress between 0-100 to ensure valid values
+ * - Inline width style used for precise control over bar progression
+ * - Variant colors follow standard semantic conventions
+ * 
+ * Improvement Opportunities:
+ * 1. Variant Expansion: Current options (primary/success/warning) could be extended
+ *    to include 'error' and 'neutral' states for better flexibility
+ * 2. Animation: Consider spring-based animations for more natural motion
+ * 3. Indeterminate State: Add support for unknown progress durations
+ * 4. Compound Components: Create ProgressBar+Label combination variant
+ */
 interface ProgressBarProps {
   progress: number // 0 to 100
   size?: 'sm' | 'md' | 'lg'

@@ -2,6 +2,19 @@ import { LoadingSpinner } from './LoadingSpinner'
 import { ProgressBar } from './ProgressBar'
 import { ErrorModal } from './ErrorModal'
 
+/**
+ * Props interface for the UploadProgress component.
+ * 
+ * Defines the essential properties needed to display and manage the upload process
+ * state within the application's recording flow.
+ * 
+ * @property fileName - The name of the file being uploaded (displayed to the user)
+ * @property progress - Numeric value between 0-100 representing upload completion percentage
+ * @property status - Current state of the upload process (idle, uploading, completed, error)
+ * @property error - Optional error message to display when status is 'error'
+ * @property onRetry - Optional callback function to retry a failed upload
+ * @property onComplete - Optional callback function triggered when upload is complete
+ */
 interface UploadProgressProps {
   fileName: string
   progress: number
@@ -11,6 +24,52 @@ interface UploadProgressProps {
   onComplete?: () => void
 }
 
+/**
+ * Upload progress visualization and management component.
+ * 
+ * This component provides visual feedback during the file upload process, showing
+ * progress percentage, current status, and handling error states. It represents
+ * the fourth step in the overall recording flow (welcome → recording → preview → upload → thank you).
+ * 
+ * Application Flow Integration:
+ * - Appears after a user finishes recording and previewing their message
+ * - When upload completes (progress reaches 100%), shows a continue button
+ * - Continue button triggers onComplete callback which transitions to the thank you state
+ * - On error, displays error modal with retry option if onRetry is provided
+ * 
+ * Key features:
+ * - Displays the file name and current upload status
+ * - Shows visual progress via the ProgressBar component
+ * - Provides error handling through ErrorModal for failed uploads
+ * - Conditionally renders a continue button when upload is complete
+ * - Supports retry functionality for failed uploads
+ * 
+ * The component changes its appearance based on the current status:
+ * - idle: Shows a "Preparing to upload..." message with a spinner
+ * - uploading: Displays progress with a blue progress bar
+ * - completed: Shows a green progress bar with a checkmark and continue button
+ * - error: Displays a yellow/warning progress bar and error modal
+ * 
+ * Implementation notes:
+ * - Pure presentational component with no internal state management
+ * - All state (progress, status, error) is controlled by parent components
+ * - Uses the getStatusDetails helper function to centralize status-dependent UI elements
+ * 
+ * Known issues:
+ * - The ErrorModal's onClose prop is set to an empty function (() => {}) which means
+ *   the modal cannot be dismissed by the user. This appears to be incomplete implementation.
+ * - Error handling relies entirely on parent components with no internal error detection
+ * 
+ * Opportunities for improvement:
+ * - Add proper onClose handler for ErrorModal to make it dismissible by users
+ * - Implement basic validation of input props (e.g., ensure progress is between 0-100)
+ * - Consider adding internal state to track retry attempts and potentially rate limit retries
+ * - Add more detailed progress information (e.g., transfer rate, time remaining)
+ * - Implement specific error handling for different types of upload failures
+ * - Add a cancellation option during upload for better user experience
+ * - Consider adding accessibility attributes for screen readers
+ * - Make status messages configurable via props for easier customization
+ */
 export function UploadProgress({
   fileName,
   progress,
@@ -19,6 +78,16 @@ export function UploadProgress({
   onRetry,
   onComplete
 }: UploadProgressProps) {
+  /**
+   * Determines the appropriate status details based on current upload state.
+   * 
+   * Returns an object with:
+   * - message: Text to display underneath the filename
+   * - icon: Visual indicator for the current status (spinner, checkmark, error icon)
+   * 
+   * This approach centralizes the state-dependent UI elements in one function
+   * rather than scattering conditional logic throughout the component.
+   */
   const getStatusDetails = () => {
     switch (status) {
       case 'idle':

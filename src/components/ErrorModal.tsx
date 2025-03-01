@@ -1,6 +1,19 @@
 import { Fragment, ReactNode } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 
+/**
+ * Props interface for the ErrorModal component.
+ * 
+ * Provides configuration options for error display, visibility control,
+ * and action buttons.
+ * 
+ * @property isOpen - Controls visibility of the modal
+ * @property onClose - Callback function when modal is closed (via backdrop click or close button)
+ * @property title - Main error heading displayed at the top of the modal
+ * @property description - Text description of the error
+ * @property action - Optional primary action button configuration
+ * @property children - Optional additional content to render below the description
+ */
 interface ErrorModalProps {
   isOpen: boolean
   onClose: () => void
@@ -13,6 +26,45 @@ interface ErrorModalProps {
   children?: ReactNode
 }
 
+/**
+ * Error display modal component with consistent styling and behavior.
+ * 
+ * This component renders a modal dialog for displaying errors and providing
+ * recovery options to users. It uses HeadlessUI components (Dialog, Transition)
+ * for accessibility and animations.
+ * 
+ * Key features:
+ * - Animated appearance/disappearance with backdrop blur
+ * - Consistent error styling with warning icon
+ * - Support for primary action button (e.g., retry) and close button
+ * - Optional children for extended error information or custom content
+ * 
+ * Integration points:
+ * - Used by multiple components including UploadProgress and WelcomeForm
+ * - Serves as a standardized error presentation layer throughout the application
+ * - Primary way to alert users about recoverable errors
+ * 
+ * Implementation notes:
+ * - The component uses HeadlessUI's Dialog for accessibility features
+ * - Transitions provide smooth animations for better UX
+ * - Responsive design adapts to different screen sizes
+ * - Default z-index (z-50) ensures modal appears above other content
+ * 
+ * Current limitations:
+ * - No built-in error state management (relies on parent components)
+ * - Multiple error modals could potentially stack if triggered simultaneously
+ * - Cannot be easily extended with additional actions without modifying the component
+ * - No standardized error categorization (warning vs. critical)
+ * 
+ * Improvement opportunities:
+ * - Add support for different severity levels (warning, error, critical)
+ * - Implement a more flexible action button system to support multiple actions
+ * - Consider adding a built-in timeout option for auto-dismissal
+ * - Add escape key handling for better keyboard accessibility
+ * - Consider implementing a global error handler that uses this component
+ * - Standardize error types and messages across the application
+ * - Add error logging functionality
+ */
 export function ErrorModal({
   isOpen,
   onClose,

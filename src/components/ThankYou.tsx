@@ -1,8 +1,52 @@
+/**
+ * Props interface for the ThankYou component.
+ * 
+ * @property guestName - Name of the guest who recorded the message
+ * @property onRecordAnother - Callback function to restart the recording process
+ */
 interface ThankYouProps {
   guestName: string
   onRecordAnother: () => void
 }
 
+/**
+ * Final confirmation screen displayed after successful message recording.
+ * 
+ * This component serves as the final step in the recording flow, providing 
+ * confirmation that the guest's message has been successfully recorded and 
+ * offering options to share or record another message.
+ * 
+ * Implementation details:
+ * - Displays a success message with the guest's name
+ * - Provides a button to record another message
+ * - Includes a basic sharing feature using Web Share API with clipboard fallback
+ * - Shows minimal error handling for non-critical sharing functionality
+ * 
+ * Features:
+ * 1. Success confirmation with personalized message
+ * 2. Option to record another message
+ * 3. Basic social sharing functionality
+ * 4. Simple, focused user interface with clear calls to action
+ * 
+ * Technical notes:
+ * - Uses navigator.share API when available with fallback to clipboard
+ * - Contains hardcoded text that ideally should be configurable
+ * - Has minimal error handling for share/copy functionality (console.error only)
+ * - Includes a placeholder message about viewing messages after the wedding
+ * 
+ * Improvement opportunities:
+ * 1. Text configuration:
+ *    - Make all text content configurable rather than hardcoded
+ *    - Consider extracting text to a centralized content configuration
+ * 
+ * 2. Enhanced sharing:
+ *    - Add more sharing options for browsers without Web Share API
+ *    - Improve visual feedback for successful/failed copy operations
+ * 
+ * 3. UI enhancements:
+ *    - Add animations for a more celebratory feel
+ *    - Consider adding the option to replay the recorded message
+ */
 export function ThankYou({ guestName, onRecordAnother }: ThankYouProps) {
   const shareMessage = `I just recorded a message for Marc & Sea's wedding! 🎉 #WavesOfLove`
 

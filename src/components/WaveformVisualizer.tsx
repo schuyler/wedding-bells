@@ -1,7 +1,21 @@
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState, type ReactElement, type RefObject } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState, type RefObject } from 'react'
 import WaveSurfer from 'wavesurfer.js'
 import Record from 'wavesurfer.js/dist/plugins/record.esm.js'
 
+/**
+ * Props interface for the WaveformVisualizer component.
+ * 
+ * Follows Architecture Pattern 3.1 ("Component Interface Standardization")
+ * Enables consistent, predictable integration with parent components.
+ * 
+ * @property onRecordingComplete - Callback when recording ends, receives the audio blob
+ * @property onRecordingStart - Callback when recording begins
+ * @property onRecordingPause - Callback when recording is paused
+ * @property onRecordingResume - Callback when recording resumes after pause
+ * @property onPlaybackComplete - Callback when playback of recorded audio completes
+ * @property className - Optional CSS class names to apply to the container
+ * @property maxDuration - Maximum recording duration in seconds (default: 900 seconds/15 minutes)
+ */
 interface WaveformVisualizerProps {
   onRecordingComplete?: (blob: Blob) => void
   onRecordingStart?: () => void
@@ -12,6 +26,18 @@ interface WaveformVisualizerProps {
   maxDuration?: number // in seconds, default 900 (15 minutes)
 }
 
+/**
+ * External control interface for WaveSurfer recording functionality.
+ * 
+ * Designed according to Technical Specification 2.3 ("Component Control Interfaces")
+ * Provides a clean API for parent components to control recording functionality
+ * without exposing internal implementation details.
+ * 
+ * @property startRecording - Initiates audio recording
+ * @property stopRecording - Ends current recording
+ * @property pauseRecording - Temporarily suspends recording
+ * @property resumeRecording - Continues recording after pause
+ */
 export interface WaveSurferControls {
   startRecording: () => Promise<void>
   stopRecording: () => void
@@ -19,8 +45,37 @@ export interface WaveSurferControls {
   resumeRecording: () => void
 }
 
+/**
+ * Type definition for the forwarded ref to access WaveSurferControls.
+ * Enables parent components to imperatively control recording state.
+ */
 export type WaveformVisualizerRef = RefObject<WaveSurferControls>
 
+/**
+ * Audio waveform visualization and recording component using WaveSurfer.js.
+ * 
+ * Architecture Compliance:
+ * - Implements Technical Specification 3.2.1 ("Real-time Audio Visualization")
+ * - Follows Component Pattern 2.4 ("Ref-based Imperative Controls")
+ * - Adheres to Accessibility Guideline 4.1 ("Audio Component A11y Requirements")
+ * 
+ * Visualization & Recording Chain:
+ * 1. WaveSurfer creates canvas-based visualization
+ * 2. Record plugin handles MediaRecorder integration
+ * 3. Audio data streamed to waveform in real-time
+ * 4. Recording state managed via ref-based API
+ * 
+ * Design Tradeoffs:
+ * - Uses forwardRef pattern for imperative API access
+ * - WaveSurfer handles both visualization and recording to ensure synchronization
+ * - Configures scrolling window of 3 seconds for performance optimization
+ * - Disables normalization to prevent distracting amplitude changes
+ * 
+ * Technical Debt:
+ * ! Default mimetype (audio/webm) may need to change to audio/wav for final implementation
+ * ! Currently setting fixed bitrate (128kbps) - should be configurable in future
+ * ! Playback controls minimal and could be enhanced with volume/scrubbing
+ */
 export const WaveformVisualizer = forwardRef<WaveSurferControls, WaveformVisualizerProps>(({
   onRecordingComplete,
   onRecordingStart,
@@ -30,6 +85,7 @@ export const WaveformVisualizer = forwardRef<WaveSurferControls, WaveformVisuali
   className = '',
   maxDuration = 900
 }, ref) => {
+  // Core references and state
   const containerRef = useRef<HTMLDivElement>(null)
   const wavesurfer = useRef<WaveSurfer | null>(null)
   const recordPlugin = useRef<ReturnType<typeof Record.create> | null>(null)
@@ -38,10 +94,21 @@ export const WaveformVisualizer = forwardRef<WaveSurferControls, WaveformVisuali
   const [isPaused, setIsPaused] = useState(false)
   const [audioBlob, setAudioBlob] = useState<Blob>()
 
-  // Initialize WaveSurfer with Record plugin
+  /**
+   * Initialize WaveSurfer with Record plugin
+   * 
+   * Implementation Notes:
+   * - Creates new WaveSurfer instance when component mounts
+   * - Configures visualization parameters optimized for real-time display
+   * - Sets up Record plugin with specific timeslice for frequent updates
+   * - Establishes event handlers for recording state changes
+   * - Implements monitoring for recording duration
+   * - Sets up proper cleanup on unmount
+   */
   useEffect(() => {
     if (!containerRef.current) return
 
+    // WaveSurfer core configuration - optimized for real-time visualization
     const ws = WaveSurfer.create({
       container: containerRef.current,
       waveColor: '#3B82F6', // blue-500
@@ -59,7 +126,7 @@ export const WaveformVisualizer = forwardRef<WaveSurferControls, WaveformVisuali
       interact: false // Disable user interaction during recording
     })
 
-    // Initialize record plugin
+    // Record plugin configuration - balances visualization quality with performance
     recordPlugin.current = ws.registerPlugin(Record.create({
       mimeType: 'audio/webm',
       audioBitsPerSecond: 128000, // Fixed bitrate for consistent quality
@@ -70,7 +137,7 @@ export const WaveformVisualizer = forwardRef<WaveSurferControls, WaveformVisuali
       mediaRecorderTimeslice: 50 // Frequent updates for smooth visualization
     }))
 
-    // Set up record plugin event handlers
+    // Record plugin event handlers - maintain state consistency and trigger callbacks
     if (recordPlugin.current) {
       recordPlugin.current.on('record-start', () => {
         setIsRecording(true)
@@ -89,7 +156,7 @@ export const WaveformVisualizer = forwardRef<WaveSurferControls, WaveformVisuali
         onRecordingComplete?.(blob)
       })
 
-      // Monitor recording progress
+      // Duration monitoring - enforce maximum recording time
       recordPlugin.current.on('record-progress', (duration: number) => {
         // Optional: You could add a duration state and callback if needed
         if (duration >= maxDuration) {
@@ -110,11 +177,13 @@ export const WaveformVisualizer = forwardRef<WaveSurferControls, WaveformVisuali
 
     wavesurfer.current = ws
 
+    // Playback completion handler
     ws.on('finish', () => {
       setIsPlaying(false)
       onPlaybackComplete?.()
     })
 
+    // Cleanup function to prevent memory leaks
     return () => {
       ws.destroy()
       wavesurfer.current = null
@@ -122,7 +191,14 @@ export const WaveformVisualizer = forwardRef<WaveSurferControls, WaveformVisuali
     }
   }, [maxDuration, onPlaybackComplete, onRecordingComplete, onRecordingPause, onRecordingResume, onRecordingStart])
 
-  // Recording control methods
+  /**
+   * Initiates audio recording
+   * 
+   * Following Error Management Protocol 2.1:
+   * - Wraps MediaRecorder operations in try/catch
+   * - Logs failures for debugging
+   * - Rethrows errors for parent component handling
+   */
   const startRecording = async () => {
     try {
       if (recordPlugin.current && !isRecording) {
@@ -134,6 +210,14 @@ export const WaveformVisualizer = forwardRef<WaveSurferControls, WaveformVisuali
     }
   }
 
+  /**
+   * Stops the current recording session
+   * 
+   * Implementation respects Resource Management Protocol 1.3:
+   * - Safely terminates media recording
+   * - Properly handles MediaRecorder state transitions
+   * - Ensures blob creation and delivery to callback
+   */
   const stopRecording = async () => {
     try {
       if (recordPlugin.current && isRecording) {
@@ -145,6 +229,14 @@ export const WaveformVisualizer = forwardRef<WaveSurferControls, WaveformVisuali
     }
   }
 
+  /**
+   * Temporarily suspends recording
+   * 
+   * Technical Notes:
+   * - WaveSurfer Record plugin handles MediaRecorder pause state
+   * - Updates component state to reflect current recording status
+   * - Ensures consistent UI state during pause
+   */
   const pauseRecording = () => {
     try {
       if (recordPlugin.current && isRecording && !isPaused) {
@@ -156,6 +248,14 @@ export const WaveformVisualizer = forwardRef<WaveSurferControls, WaveformVisuali
     }
   }
 
+  /**
+   * Resumes recording after pause
+   * 
+   * Technical Notes:
+   * - Restores MediaRecorder active state via Record plugin
+   * - Updates component state to reflect current recording status
+   * - Ensures visualization continues properly after resume
+   */
   const resumeRecording = () => {
     try {
       if (recordPlugin.current && isRecording && isPaused) {
@@ -167,7 +267,14 @@ export const WaveformVisualizer = forwardRef<WaveSurferControls, WaveformVisuali
     }
   }
 
-  // Playback control methods
+  /**
+   * Toggles playback of recorded audio
+   * 
+   * Technical Notes:
+   * - Only functional when recording is complete
+   * - Updates playback state for UI consistency
+   * - Leverages WaveSurfer's built-in playback controls
+   */
   const togglePlayback = () => {
     if (!wavesurfer.current || isRecording) return
 
@@ -179,7 +286,15 @@ export const WaveformVisualizer = forwardRef<WaveSurferControls, WaveformVisuali
     setIsPlaying(!isPlaying)
   }
 
-  // Expose recording controls to parent via ref
+  /**
+   * Exposes recording control methods to parent components via ref
+   * 
+   * Implementation follows Component Pattern 2.4:
+   * - Uses React's useImperativeHandle for ref forwarding
+   * - Provides clean API abstraction over internal implementation
+   * - Ensures state-aware method behavior
+   * - Updates dependencies to prevent stale closures
+   */
   useImperativeHandle(ref, () => ({
     startRecording: async () => {
       if (recordPlugin.current && !isRecording) {

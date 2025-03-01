@@ -7,6 +7,45 @@ import { ThankYou } from './components/ThankYou'
 import { BrowserCheck } from './components/BrowserCheck'
 import { GuestInfo, RecordingState, BrowserCompatibility } from './types'
 
+/**
+ * Root application component managing the wedding message recording workflow.
+ * 
+ * This component orchestrates the core recording flow state machine and coordinates
+ * between all sub-components. It follows the State Machine pattern with explicit
+ * transitions between phases.
+ * 
+ * Application Flow:
+ * 1. Welcome (guest info collection)
+ * 2. Recording (audio capture)
+ * 3. Preview (audio review) - TODO: Implement in Phase 3
+ * 4. Upload (progress tracking)
+ * 5. Thank You (confirmation)
+ * 
+ * Key Responsibilities:
+ * - Maintains core application state and phase transitions
+ * - Handles cross-component communication via props
+ * - Manages browser compatibility checks
+ * - Provides mock upload functionality until Phase 4 implementation
+ * 
+ * Technical Architecture:
+ * - Uses React useState for simple state management (Phase 4 will migrate to Zustand)
+ * - Implements prop drilling pattern temporarily (will be replaced with context API)
+ * - Follows Atomic Design principles for component composition
+ * 
+ * Technical Debt & Considerations:
+ * ! Current state management doesn't scale - Phase 4 requires XState integration
+ * ! Mock upload progress needs Tus protocol implementation
+ * ! Preview phase currently unimplemented (see Phase 3 roadmap)
+ * ! Duplicate browser compatibility checks exist (needs context provider)
+ * 
+ * Improvement Roadmap:
+ * 1. Phase 3: Implement audio preview functionality with waveform visualization
+ * 2. Phase 4: 
+ *    - Adopt Tus protocol for resumable uploads
+ *    - Migrate to Zustand for global state management
+ *    - Add error recovery and offline support
+ * 3. Accessibility: Enhance ARIA labels and keyboard navigation
+ */
 function App() {
   const [recordingState, setRecordingState] = useState<RecordingState>('welcome')
   const [guestInfo, setGuestInfo] = useState<GuestInfo | null>(null)

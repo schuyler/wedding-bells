@@ -1,3 +1,30 @@
+/**
+ * Loading spinner component with configurable sizing and overlay variants.
+ * 
+ * Responsibilities:
+ * - Visual feedback during asynchronous operations
+ * - Accessible progress indication
+ * - Flexible sizing for different UI contexts
+ * - Full-screen overlay capability for page-level loading
+ * 
+ * Implementation Notes:
+ * - Uses CSS border animation technique for smooth spinning effect
+ * - Implements WAI-ARIA progressbar role for accessibility
+ * - Provides size variants through Tailwind class maps
+ * - Supports full-screen mode with semi-transparent backdrop
+ * 
+ * Common Usage Patterns:
+ * - Form submission states (seen in WelcomeForm.tsx)
+ * - Audio recording initialization (AudioRecorder.tsx)
+ * - File upload progression (UploadProgress.tsx)
+ * - Full-page loading transitions
+ * 
+ * Improvement Opportunities:
+ * 1. Animation Variants: Add pulse/spin speed options
+ * 2. Color Customization: Allow theme-based coloring
+ * 3. Progress Percentage: Add numeric progress display
+ * 4. ARIA Enhancements: Implement aria-valuenow for determinate states
+ */
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg'
   light?: boolean
