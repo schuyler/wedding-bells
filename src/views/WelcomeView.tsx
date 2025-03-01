@@ -6,31 +6,24 @@ import { WelcomeForm } from '../components/WelcomeForm';
  * @interface WelcomeViewProps
  * @property {(guestInfo: { name: string }) => void} onSubmit - Callback fired when guest info is submitted
  */
-interface WelcomeViewProps {
-  onSubmit: (guestInfo: { name: string }) => void;
-}
+import { useRecording } from '../context/RecordingContext';
 
 /**
  * Welcome view component for collecting initial guest information.
  * 
  * This component serves as the entry point of the wedding message recording workflow,
- * collecting guest information before proceeding to recording. It's a pure refactor
- * from App.tsx welcome state.
+ * collecting guest information before proceeding to recording.
  * 
  * Component Flow:
  * 1. Displays welcome form interface
  * 2. Collects guest name
- * 3. Triggers submission callback
- * 
- * @component
- * @param {WelcomeViewProps} props - Component props
- * @returns {React.ReactElement} Welcome interface
- * 
- * Technical Architecture:
- * - Implements view layer of welcome state
- * - Uses WelcomeForm component for data collection
- * - Pure presentational component (logic handled by parent)
+ * 3. Uses context to manage state and navigation
  */
-export function WelcomeView({ onSubmit }: WelcomeViewProps): React.ReactElement {
-  return <WelcomeForm onSubmit={onSubmit} />;
+export function WelcomeView(): React.ReactElement {
+  const { setGuestInfo, goToNextStep } = useRecording();
+  const handleSubmit = (info: { name: string }) => {
+    setGuestInfo({ name: info.name, email: '' });
+    goToNextStep();
+  };
+  return <WelcomeForm onSubmit={handleSubmit} />;
 }
