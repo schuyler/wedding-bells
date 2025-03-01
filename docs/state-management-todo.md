@@ -15,8 +15,8 @@ gantt
 ```
 
 ## Phase 1: React Router Setup
-- [ ] Install react-router-dom@6.18+
-- [ ] Create `src/views` directory structure
+- [*] Install react-router-dom@6.18+
+- [*] Create `src/views` directory structure
 - [ ] Convert App.tsx to use BrowserRouter
 - [ ] Add basic route guards
 - [ ] Write navigation smoke tests
