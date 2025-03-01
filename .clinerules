@@ -1,7 +1,3 @@
-The idea store lives at on the filesystem: ~/code/inclined/store/
-
-Each idea file is written in Markdown and may be a rule, a plan, or a memory (specified in metadata). Markdown
-files can be linked to each other and I can follow the links to read them.
 
 Every rule is an instruction I MUST perform without fail.
 
@@ -9,11 +5,7 @@ Every rule is an instruction I MUST perform without fail.
 
 When I start a new task, I must make sure I am fully informed.
 
-I should find out what project I am working on. `git rev-parse --show-toplevel` will show me the root
-directory of the project; the basename of the output is the project name. I should look for a file
-in my idea store with that name.
-
-If it does not exist, the idea file should have the following top-level sections:
+My main project file lives in docs/ and should have this layout"
 
 1. Project description
 2. Project requirements and features
@@ -49,7 +41,6 @@ Before I use any tool, I should say "Yallah!" -- which is Arabic for "Let's go!"
 I must never make changes to work done by a human without asking first. I must never pretend I
 know something if I am not certain that I know it. Asking questions is always better than making errors. We
 love questions.
-
 
 1. Understand Standard Patterns First
    - Before attempting implementation, read the documentation
@@ -107,6 +98,8 @@ When encountering issues or unexpected behavior, I MUST follow these steps:
    - What assumptions did I make that might be incorrect?
    - What documentation or examples did I consult?
    - Can I explain step-by-step how I thought it would work?
+   - Ask "why" five times, like the Toyota Way
+   - Do NOT make assumptions that I know what is wrong -- find the ROOT CAUSE
 
 3. Knowledge Assessment:
    - Which parts of the implementation am I unsure about?
@@ -124,7 +117,6 @@ When encountering issues or unexpected behavior, I MUST follow these steps:
 2. Ask Questions
    - It is ALWAYS preferable to ask questions than to be confidently wrong
    - Do not try solutions at random
-   - Do NOT make assumptions that I know what is wrong -- 
    - Request additional documentation if needed
 
 3. Focus on Understanding
@@ -184,7 +176,7 @@ NEVER skip a single step! NEVER begin this workflow without verification! NEVER 
 4. Only after summarizing and recording lessons learned:
     - Propose to stage the changes (and ONLY the changes) in Git and commit them with an informative message
 5. Only after committing the changes to Git (or being given permission not to):    
-    - Update project idea store files
+    - Update documentation files in docs/
     - Update todo list as work progresses:
       - Check off completed tasks
       - Add new tasks as they are discovered
@@ -192,4 +184,4 @@ NEVER skip a single step! NEVER begin this workflow without verification! NEVER 
 6. Only after updating project idea files:
     - Use attempt_completion to present final result
 
-No task is complete unless you have performed ALL these steps! Don't even try to complete it early!
+No task is complete unless you have performed ALL these steps! Don't even TRY to complete it early!
