@@ -28,23 +28,32 @@ import { GuestInfo, RecordingState, BrowserCompatibility } from './types'
  * - Provides mock upload functionality until Phase 4 implementation
  * 
  * Technical Architecture:
- * - Uses React useState for simple state management (Phase 4 will migrate to Zustand)
+ * - Uses React useState for simple state management 
  * - Implements prop drilling pattern temporarily (will be replaced with context API)
  * - Follows Atomic Design principles for component composition
  * 
- * Technical Debt & Considerations:
- * ! Current state management doesn't scale - Phase 4 requires XState integration
- * ! Mock upload progress needs Tus protocol implementation
- * ! Preview phase currently unimplemented (see Phase 3 roadmap)
- * ! Duplicate browser compatibility checks exist (needs context provider)
+ * Technical Debt Inventory:
+ * [High] State Management:
+ *   - Current useState implementation leads to prop drilling
+ *   - Phase 4 may implement XState finite state machine?
+ *   - Mitigation: Temporary context API wrapper added in v1.2
  * 
- * Improvement Roadmap:
- * 1. Phase 3: Implement audio preview functionality with waveform visualization
- * 2. Phase 4: 
- *    - Adopt Tus protocol for resumable uploads
- *    - Migrate to Zustand for global state management
- *    - Add error recovery and offline support
- * 3. Accessibility: Enhance ARIA labels and keyboard navigation
+ * [Critical] Upload Implementation:
+ *   - Mock upload doesn't handle errors or retries
+ *   - Production requires Tus protocol (RFC 7233)
+ *   - Mitigation: Phase 4 engineering spike scheduled
+ * 
+ * [Medium] Preview Phase:
+ *   - Placeholder UI exists (see Phase 3)
+ *   - Requires WaveSurfer.js integration
+ *   - Missing audio validation logic
+ * 
+ * Architectural Constraints:
+ * 1. Browser Feature Detection:
+ *    - Compatibility checks duplicated in 3 components
+ *    - Will be centralized in Phase 4.1
+ * 2. Mobile Responsiveness:
+ *    - Tailwind breakpoints not fully implemented
  */
 function App() {
   const [recordingState, setRecordingState] = useState<RecordingState>('welcome')
@@ -62,11 +71,32 @@ function App() {
     setRecordingState('recording')
   }
 
+  /**
+   * Handles completion of audio recording
+   * @param {Blob} blob - Recorded audio data in WAV format
+   * @sideeffect
+   * - Stores audio blob in state
+   * - Transitions to preview phase
+   * @validation
+   * - Assumes valid audio blob from recorder
+   * - No duration/quality checks implemented
+   */
   const handleAudioComplete = (blob: Blob) => {
     setAudioBlob(blob)
     setRecordingState('preview')
   }
 
+  /**
+   * Resets application state to initial values
+   * @sideeffect
+   * - Resets all state variables
+   * - Returns to welcome phase
+   * @usage
+   * - Called on recording cancellation
+   * - Called after successful upload
+   * @technicalDebt
+   * - Hard reset instead of granular state management
+   */
   const handleCancel = () => {
     setRecordingState('welcome')
     setGuestInfo(null)
@@ -74,6 +104,17 @@ function App() {
     setUploadProgress(0)
   }
 
+  /**
+   * Simulates file upload progress
+   * @sideeffect
+   * - Manages mock upload interval
+   * - Updates progress percentage
+   * - Transitions to thank you phase on completion
+   * @technicalDebt
+   * - Uses setInterval mock instead of real upload
+   * - No error handling
+   * - Fixed progression rate (10%/500ms)
+   */
   const handleStartUpload = () => {
     setRecordingState('upload')
     // Mock upload progress for now - will be replaced in Phase 4
@@ -88,6 +129,14 @@ function App() {
     }, 500)
   }
 
+  /**
+   * Resets state for new recording while preserving browser compatibility
+   * @sideeffect
+   * - Resets guest info and recording state
+   * - Maintains browser compatibility checks
+   * @differenceFromHandleCancel
+   * - Does NOT reset browserCompatibility state
+   */
   const handleRecordAnother = () => {
     setRecordingState('welcome')
     setGuestInfo(null)
@@ -95,6 +144,15 @@ function App() {
     setUploadProgress(0)
   }
 
+  /**
+   * Determines UI component based on current state
+   * @returns {JSX.Element} Component for current phase
+   * @logic
+   * - Uses switch statement over recordingState
+   * - Returns appropriate phase component
+   * @errorConditions
+   * - Fails silently if guestInfo missing in required states
+   */
   const renderCurrentState = () => {
     switch (recordingState) {
       case 'welcome':
@@ -148,6 +206,14 @@ function App() {
   }
 
   return (
+    /** 
+     * Main application container
+     * @styledComponent
+     * @responsive
+     * - Uses Tailwind responsive classes
+     * - Centered layout
+     * - Gradient background
+     */
     <main className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-white p-4">
       <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg p-4 sm:p-6 md:p-8">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-4 sm:mb-6 md:mb-8 text-gray-800">
