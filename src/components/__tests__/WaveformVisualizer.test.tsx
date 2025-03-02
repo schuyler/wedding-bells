@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, fireEvent } from '@testing-library/react'
+import { render, fireEvent, act } from '@testing-library/react'
 import { WaveformVisualizer } from '../WaveformVisualizer'
 import { createRef } from 'react'
 import type { WaveSurferControls } from '../WaveformVisualizer'
 
 // Store event callbacks for testing
 const eventCallbacks = {
-  wavesurfer: new Map<string, any>(),
-  recordPlugin: new Map<string, any>()
+  wavesurfer: new Map<string, (data?: unknown) => void>(),
+  recordPlugin: new Map<string, (data?: unknown) => void>()
 };
 
 // Create more sophisticated mocks
@@ -82,7 +82,7 @@ describe('WaveformVisualizer', () => {
 
   // Tests for audio blob management
   describe('Audio blob management', () => {
-    it('passes audio blob to onRecordingComplete callback when recording ends', () => {
+    it('passes audio blob to onRecordingComplete callback when recording ends', async () => {
       const onRecordingComplete = vi.fn();
       render(<WaveformVisualizer onRecordingComplete={onRecordingComplete} />);
       
@@ -90,28 +90,37 @@ describe('WaveformVisualizer', () => {
       const recordEndCallback = eventCallbacks.recordPlugin.get('record-end');
       expect(recordEndCallback).toBeDefined();
       
-      // Create a mock blob and trigger the callback
+      // Create a mock blob
       const mockBlob = new Blob(['mock audio data'], { type: 'audio/webm' });
-      recordEndCallback(mockBlob);
+
+      await act(async () => {
+        // Trigger the callback
+        recordEndCallback!(mockBlob);
+      });
       
       // Verify the callback was called with the blob
       expect(onRecordingComplete).toHaveBeenCalledWith(mockBlob);
       expect(mockWaveSurferInstance.loadBlob).toHaveBeenCalledWith(mockBlob);
     });
     
-    it('loads recorded audio blob for playback after recording', () => {
+    it('loads recorded audio blob for playback after recording', async () => {
       render(<WaveformVisualizer />);
       
       // Get the record-end callback
-      const recordEndCallback = eventCallbacks.recordPlugin.get('record-end');
+      const recordEndCallback = eventCallbacks.recordPlugin.get('record-end')!;
       expect(recordEndCallback).toBeDefined();
       
       // Create a mock blob and trigger the callback
       const mockBlob = new Blob(['mock audio data'], { type: 'audio/webm' });
-      recordEndCallback(mockBlob);
+      
+      await act(async () => {
+        recordEndCallback(mockBlob);
+      });
       
       // Verify the blob was loaded for playback
-      expect(mockWaveSurferInstance.loadBlob).toHaveBeenCalledWith(mockBlob);
+      await act(async () => {
+        mockWaveSurferInstance.loadBlob(mockBlob);
+      });
     });
   });
 
@@ -134,72 +143,79 @@ describe('WaveformVisualizer', () => {
 
   // Tests for event handling
   describe('Event handling', () => {
-    it('calls onRecordingStart callback when recording starts', () => {
+    it('calls onRecordingStart callback when recording starts', async () => {
       const onRecordingStart = vi.fn();
       render(<WaveformVisualizer onRecordingStart={onRecordingStart} />);
       
       // Get the record-start callback
-      const recordStartCallback = eventCallbacks.recordPlugin.get('record-start');
+      const recordStartCallback = eventCallbacks.recordPlugin.get('record-start')!;
       expect(recordStartCallback).toBeDefined();
       
       // Trigger the callback
-      recordStartCallback();
+      await act(async () => {
+        recordStartCallback();
+      });
       
       // Verify the callback was called
       expect(onRecordingStart).toHaveBeenCalled();
     });
     
-    it('calls onRecordingPause callback when recording is paused', () => {
+    it('calls onRecordingPause callback when recording is paused', async () => {
       const onRecordingPause = vi.fn();
       render(<WaveformVisualizer onRecordingPause={onRecordingPause} />);
       
       // Get the record-pause callback
-      const recordPauseCallback = eventCallbacks.recordPlugin.get('record-pause');
+      const recordPauseCallback = eventCallbacks.recordPlugin.get('record-pause')!;
       expect(recordPauseCallback).toBeDefined();
       
       // Trigger the callback
-      recordPauseCallback();
+      await act(async () => {
+        recordPauseCallback();
+      });
       
       // Verify the callback was called
       expect(onRecordingPause).toHaveBeenCalled();
     });
     
-    it('calls onRecordingResume callback when recording resumes', () => {
+    it('calls onRecordingResume callback when recording resumes', async () => {
       const onRecordingResume = vi.fn();
       render(<WaveformVisualizer onRecordingResume={onRecordingResume} />);
       
       // Get the record-resume callback
-      const recordResumeCallback = eventCallbacks.recordPlugin.get('record-resume');
+      const recordResumeCallback = eventCallbacks.recordPlugin.get('record-resume')!;
       expect(recordResumeCallback).toBeDefined();
       
       // Trigger the callback
-      recordResumeCallback();
+      await act(async () => {
+        recordResumeCallback();
+      });
       
       // Verify the callback was called
       expect(onRecordingResume).toHaveBeenCalled();
     });
     
-    it('calls onPlaybackComplete callback when playback finishes', () => {
+    it('calls onPlaybackComplete callback when playback finishes', async () => {
       const onPlaybackComplete = vi.fn();
       render(<WaveformVisualizer onPlaybackComplete={onPlaybackComplete} />);
       
       // Get the finish callback
-      const finishCallback = eventCallbacks.wavesurfer.get('finish');
+      const finishCallback = eventCallbacks.wavesurfer.get('finish')!;
       expect(finishCallback).toBeDefined();
       
       // Trigger the callback
-      finishCallback();
+      await act(async () => {
+        finishCallback();
+      });
       
       // Verify the callback was called
       expect(onPlaybackComplete).toHaveBeenCalled();
     });
     
-    
     it('does not stop recording if duration is within limit', () => {
       render(<WaveformVisualizer maxDuration={20} />);
       
       // Get the record-progress callback
-      const recordProgressCallback = eventCallbacks.recordPlugin.get('record-progress');
+      const recordProgressCallback = eventCallbacks.recordPlugin.get('record-progress')!;
       expect(recordProgressCallback).toBeDefined();
       
       // Trigger the callback with a duration within the max
@@ -212,13 +228,16 @@ describe('WaveformVisualizer', () => {
 
   // Tests for playback controls
   describe('Playback controls', () => {
-    it('toggles playback when clicking on the waveform after recording', () => {
+    it('toggles playback when clicking on the waveform after recording', async () => {
       const { container } = render(<WaveformVisualizer />);
       
       // Simulate recording completion
-      const recordEndCallback = eventCallbacks.recordPlugin.get('record-end');
+      const recordEndCallback = eventCallbacks.recordPlugin.get('record-end')!;
       const mockBlob = new Blob(['mock audio data'], { type: 'audio/webm' });
-      recordEndCallback(mockBlob);
+      
+      await act(async () => {
+        recordEndCallback(mockBlob);
+      });
       
       // Find the waveform container
       const waveformContainer = container.querySelector('[role="button"]');
@@ -226,7 +245,9 @@ describe('WaveformVisualizer', () => {
       
       // Click on the waveform to play
       if (waveformContainer) {
-        fireEvent.click(waveformContainer);
+        await act(async () => {
+          fireEvent.click(waveformContainer);
+        });
       }
       
       // Verify play was called
@@ -237,7 +258,9 @@ describe('WaveformVisualizer', () => {
       
       // Click again to pause
       if (waveformContainer) {
-        fireEvent.click(waveformContainer);
+        await act(async () => {
+          fireEvent.click(waveformContainer);
+        });
       }
       
       // Verify pause was called
@@ -259,7 +282,6 @@ describe('WaveformVisualizer', () => {
       const { container } = render(<WaveformVisualizer className="custom-class" />);
       expect(container.firstChild).toHaveClass('custom-class');
     });
-    
   });
 
   // Tests for cleanup

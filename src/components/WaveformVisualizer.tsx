@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState, type RefObject } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState, type RefObject, useCallback } from 'react'
 import WaveSurfer from 'wavesurfer.js'
 import Record from 'wavesurfer.js/dist/plugins/record.esm.js'
 
@@ -105,6 +105,17 @@ export const WaveformVisualizer = forwardRef<WaveSurferControls, WaveformVisuali
    * - Implements monitoring for recording duration
    * - Sets up proper cleanup on unmount
    */
+  const stopRecording = useCallback(async () => {
+    try {
+      if (recordPlugin.current && isRecording) {
+        await recordPlugin.current.stopRecording()
+      }
+    } catch (err) {
+      console.error('Failed to stop recording:', err)
+      throw err
+    }
+  }, [isRecording])
+
   useEffect(() => {
     if (!containerRef.current) return
 
@@ -189,7 +200,7 @@ export const WaveformVisualizer = forwardRef<WaveSurferControls, WaveformVisuali
       wavesurfer.current = null
       recordPlugin.current = null
     }
-  }, [maxDuration, onPlaybackComplete, onRecordingComplete, onRecordingPause, onRecordingResume, onRecordingStart])
+  }, [maxDuration, onPlaybackComplete, onRecordingComplete, onRecordingPause, onRecordingResume, onRecordingStart, isRecording, stopRecording])
 
   /**
    * Initiates audio recording
@@ -199,74 +210,6 @@ export const WaveformVisualizer = forwardRef<WaveSurferControls, WaveformVisuali
    * - Logs failures for debugging
    * - Rethrows errors for parent component handling
    */
-  const startRecording = async () => {
-    try {
-      if (recordPlugin.current && !isRecording) {
-        await recordPlugin.current.startRecording()
-      }
-    } catch (err) {
-      console.error('Failed to start recording:', err)
-      throw err
-    }
-  }
-
-  /**
-   * Stops the current recording session
-   * 
-   * Implementation respects Resource Management Protocol 1.3:
-   * - Safely terminates media recording
-   * - Properly handles MediaRecorder state transitions
-   * - Ensures blob creation and delivery to callback
-   */
-  const stopRecording = async () => {
-    try {
-      if (recordPlugin.current && isRecording) {
-        await recordPlugin.current.stopRecording()
-      }
-    } catch (err) {
-      console.error('Failed to stop recording:', err)
-      throw err
-    }
-  }
-
-  /**
-   * Temporarily suspends recording
-   * 
-   * Technical Notes:
-   * - WaveSurfer Record plugin handles MediaRecorder pause state
-   * - Updates component state to reflect current recording status
-   * - Ensures consistent UI state during pause
-   */
-  const pauseRecording = () => {
-    try {
-      if (recordPlugin.current && isRecording && !isPaused) {
-        recordPlugin.current.pauseRecording()
-      }
-    } catch (err) {
-      console.error('Failed to pause recording:', err)
-      throw err
-    }
-  }
-
-  /**
-   * Resumes recording after pause
-   * 
-   * Technical Notes:
-   * - Restores MediaRecorder active state via Record plugin
-   * - Updates component state to reflect current recording status
-   * - Ensures visualization continues properly after resume
-   */
-  const resumeRecording = () => {
-    try {
-      if (recordPlugin.current && isRecording && isPaused) {
-        recordPlugin.current.resumeRecording()
-      }
-    } catch (err) {
-      console.error('Failed to resume recording:', err)
-      throw err
-    }
-  }
-
   /**
    * Toggles playback of recorded audio
    * 
