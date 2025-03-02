@@ -44,6 +44,7 @@
     "globals": "^15.14.0",
     "happy-dom": "^17.1.8",
     "jsdom": "^26.0.0",
+    "jsdom-testing-mocks": "^1.13.1",
     "prettier": "^3.5.2",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.22.0",
