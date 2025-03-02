@@ -69,7 +69,7 @@ export function CountdownTimer({
   const radius = 36
   const circumference = 2 * Math.PI * radius
   const strokeDasharray = `${circumference}`
-  const strokeDashoffset = circumference - (progress / 100) * circumference
+  const strokeDashoffset = duration === 0 ? 0 : circumference - (progress / 100) * circumference
 
   /**
    * Timer effect to update the countdown display.
