@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { useRecording, RecordingProvider } from '../RecordingContext';
-import { BrowserRouter, useNavigate } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { simulateHistoryNavigation } from '../../test/test-utils';
 
 // Mock useNavigate

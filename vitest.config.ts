@@ -8,6 +8,8 @@ export default defineConfig({
     environment: 'happy-dom',
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
+    // only run once
+    watch: false,
     coverage: {
       provider: 'istanbul',
       reporter: ['text', 'json', 'html'],

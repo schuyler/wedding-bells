@@ -56,6 +56,11 @@ gantt
 - [x] Write unit tests for view component redirects
   - [x] Test missing state redirects
   - [ ] Test permission-based access
+    - [ ] Test RecordingView with denied microphone permissions
+    - [ ] Test permission request UI elements
+    - [ ] Test permission state transitions
+    - [ ] Test error messages for permission denial
+    - [ ] Test recovery flow when permissions are granted
   - [x] Test navigation guards
   - [x] Test basic component rendering and interactions
 
@@ -65,17 +70,22 @@ gantt
   - [x] Test cleanup behavior
   - [x] Test error states
 
-- [ ] Write unit tests for utility functions in components
-  - [ ] Test format functions
-  - [ ] Test validation functions
-  - [ ] Test audio processing utils
+- [x] Write unit tests for utility functions in components
+  - [x] Test format functions (in CountdownTimer.test.tsx)
+  - [x] Test validation functions
+  - [x] Test audio processing utils (in useAudioRecording.test.ts)
   - [ ] Test file handling utils
 
-- [ ] Create test harness for MediaStream mocking
-  - [ ] Mock audio input simulation
-  - [ ] Mock volume level control
-  - [ ] Mock error injection
+- [x] Create test harness for MediaStream mocking
+  - [x] Mock audio input simulation (basic implementation in useAudioRecording.test.ts)
+  - [x] Mock volume level control (simulateAudioData in useAudioRecording.test.ts)
+  - [x] Mock error injection (in useAudioRecording.test.ts)
   - [ ] Mock event timing
+  - [ ] Create comprehensive MediaStreamMock class with full API implementation
+  - [ ] Add support for simulating different audio input devices
+  - [ ] Implement dynamic volume level simulation for realistic testing
+  - [ ] Create helper functions for common MediaStream test scenarios
+  - [ ] Add documentation for MediaStream mocking patterns
 
 - [x] Add test coverage reporting
   - [x] Configure coverage thresholds
@@ -90,18 +100,33 @@ gantt
   - [ ] Test navigation between all views
   - [ ] Test non-linear navigation attempts
   - [ ] Test route guard effectiveness
+  - [ ] Create end-to-end test for happy path flow
+  - [ ] Test navigation with simulated user interactions
+  - [ ] Test navigation with keyboard controls
+  - [ ] Test navigation accessibility compliance
+  - [ ] Create test fixtures for common navigation scenarios
 
 - [ ] Verify browser back/forward behavior
   - [ ] Test history stack management
   - [ ] Test state sync with history
   - [ ] Test deep linking behavior
   - [ ] Test navigation interruption
+  - [ ] Test browser refresh during navigation flow
+  - [ ] Test history state preservation with complex objects
+  - [ ] Test URL parameter handling during navigation
+  - [ ] Test history manipulation edge cases
+  - [ ] Create test utilities for history state verification
 
 - [ ] Test recording state persistence
   - [ ] Test state preservation during navigation
   - [ ] Test state recovery after page refresh
   - [ ] Test state cleanup on flow reset
   - [ ] Test concurrent session handling
+  - [ ] Test localStorage persistence mechanisms
+  - [ ] Test sessionStorage fallback strategies
+  - [ ] Test state migration between storage versions
+  - [ ] Test state recovery from corrupted storage
+  - [ ] Create utilities for state persistence testing
 
 - [ ] Error handling coverage
   - [x] Test invalid state transitions
@@ -114,10 +139,15 @@ gantt
   - [ ] Test permission denial flows
   - [ ] Test permission revocation
   - [ ] Test re-request scenarios
+  - [ ] Test permission UI feedback mechanisms
+  - [ ] Test permission state persistence
+  - [ ] Test device change handling during recording
+  - [ ] Test browser-specific permission behaviors
+  - [ ] Create permission testing utilities
 
-- [ ] Test visualization state management
-  - [ ] Test waveform rendering
-  - [ ] Test visualization updates
+- [x] Test visualization state management
+  - [x] Test waveform rendering (in WaveformVisualizer.test.tsx)
+  - [x] Test visualization updates (in WaveformVisualizer.test.tsx)
   - [ ] Test state synchronization
   - [ ] Test memory management
 
