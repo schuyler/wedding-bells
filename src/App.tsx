@@ -79,4 +79,6 @@ function App() {
   );
 }
 
+export { AppContent };
+
 export default App;
