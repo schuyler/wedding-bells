@@ -59,11 +59,11 @@ gantt
   - [x] Test navigation guards
   - [x] Test basic component rendering and interactions
 
-- [ ] Write unit tests for useAudioRecording hook
-  - [ ] Test initialization
-  - [ ] Test volume analysis
-  - [ ] Test cleanup behavior
-  - [ ] Test error states
+- [x] Write unit tests for useAudioRecording hook
+  - [x] Test initialization
+  - [x] Test volume analysis
+  - [x] Test cleanup behavior
+  - [x] Test error states
 
 - [ ] Write unit tests for utility functions in components
   - [ ] Test format functions
