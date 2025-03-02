@@ -14,6 +14,7 @@ interface RecordingContextType {
   goToPreviousStep: () => void;
   setGuestInfo: (info: GuestInfo) => void;
   setAudioBlob: (blob: Blob) => void;
+  setIsRecording: (value: boolean) => void;
   startUpload: () => void;
   resetFlow: () => void;
 }
@@ -71,6 +72,7 @@ export const RecordingProvider = ({ children }: { children: ReactNode }) => {
       goToPreviousStep,
       setGuestInfo,
       setAudioBlob,
+      setIsRecording,
       startUpload,
       resetFlow
     }}>

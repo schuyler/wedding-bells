@@ -25,13 +25,63 @@ gantt
 - [x] Basic route guards implementation
 
 ## Immediate Priority - Unit Testing
+
+### Infrastructure Setup (Required for all tests)
+- [x] Install test dependencies
+  - [x] vitest
+  - [x] @testing-library/react
+  - [x] @testing-library/user-event
+  - [x] @testing-library/jest-dom
+  - [x] happy-dom
+  - [x] @vitest/coverage-c8
+- [ ] Configure test environment
+  - [x] Create vitest.config.ts
+  - [x] Set up test utils directory structure
+  - [x] Create test setup file
+  - [ ] Configure coverage reporting
+
+### Primary Test Implementation
 - [ ] Write unit tests for RecordingContext navigation methods
+  - [ ] Test linear flow restrictions
+  - [ ] Test history integration
+  - [ ] Test state preservation
+  - [ ] Test invalid transitions
+
 - [ ] Write unit tests for state transitions in RecordingContext
+  - [ ] Test recording state changes
+  - [ ] Test guest info updates
+  - [ ] Test audio blob management
+  - [ ] Test error state handling
+
 - [ ] Write unit tests for view component redirects
+  - [ ] Test missing state redirects
+  - [ ] Test permission-based access
+  - [ ] Test navigation guards
+  - [ ] Test error boundaries
+
 - [ ] Write unit tests for useAudioRecording hook
+  - [ ] Test initialization
+  - [ ] Test volume analysis
+  - [ ] Test cleanup behavior
+  - [ ] Test error states
+
 - [ ] Write unit tests for utility functions in components
+  - [ ] Test format functions
+  - [ ] Test validation functions
+  - [ ] Test audio processing utils
+  - [ ] Test file handling utils
+
 - [ ] Create test harness for MediaStream mocking
+  - [ ] Mock audio input simulation
+  - [ ] Mock volume level control
+  - [ ] Mock error injection
+  - [ ] Mock event timing
+
 - [ ] Add test coverage reporting
+  - [ ] Configure coverage thresholds
+  - [ ] Set up coverage reports
+  - [ ] Add coverage badges
+  - [ ] Document coverage requirements
 
 ## High Priority - Recording Engine Abstraction
 - [ ] Create `src/services/RecordingEngine.ts` interface and implementation
@@ -52,13 +102,52 @@ gantt
 
 ## Testing & QA
 - [ ] Implement navigation flow tests
+  - [ ] Test complete recording flow
+  - [ ] Test navigation between all views
+  - [ ] Test non-linear navigation attempts
+  - [ ] Test route guard effectiveness
+
 - [ ] Test recording state persistence
+  - [ ] Test state preservation during navigation
+  - [ ] Test state recovery after page refresh
+  - [ ] Test state cleanup on flow reset
+  - [ ] Test concurrent session handling
+
 - [ ] Verify browser back/forward behavior
+  - [ ] Test history stack management
+  - [ ] Test state sync with history
+  - [ ] Test deep linking behavior
+  - [ ] Test navigation interruption
+
 - [ ] Error handling coverage
+  - [ ] Test network failure scenarios
+  - [ ] Test invalid state transitions
+  - [ ] Test API error responses
+  - [ ] Test recovery procedures
+
 - [ ] Test permission handling scenarios
+  - [ ] Test initial permission requests
+  - [ ] Test permission denial flows
+  - [ ] Test permission revocation
+  - [ ] Test re-request scenarios
+
 - [ ] Test visualization state management
+  - [ ] Test waveform rendering
+  - [ ] Test visualization updates
+  - [ ] Test state synchronization
+  - [ ] Test memory management
+
 - [ ] Performance testing for visualization updates
+  - [ ] Measure render performance
+  - [ ] Test high-load scenarios
+  - [ ] Profile memory usage
+  - [ ] Test device limitations
+
 - [ ] Test audio quality and encoding
+  - [ ] Test various audio inputs
+  - [ ] Verify encoding quality
+  - [ ] Test file size optimization
+  - [ ] Validate playback quality
 
 ## Documentation
 - [ ] Update technical documentation with new architecture
