@@ -123,4 +123,79 @@ describe('WelcomeForm', () => {
     // Verify getUserMedia was called with audio
     expect(mockGetUserMedia).toHaveBeenCalledWith({ audio: true })
   })
+
+  it('handles "Try Again" button click after microphone access denied', async () => {
+    const user = userEvent.setup()
+    mockGetUserMedia
+      .mockRejectedValueOnce(new Error('Permission denied'))
+      .mockResolvedValueOnce(new MediaStreamMock())
+    
+    render(<WelcomeForm onSubmit={mockOnSubmit} />)
+    
+    // Enter name and submit
+    await user.type(screen.getByLabelText(/your name/i), 'John Doe')
+    await user.click(screen.getByRole('button', { name: /start recording/i }))
+    
+    // Wait for error modal
+    await waitFor(() => {
+      expect(screen.getByText(/microphone access required/i)).toBeInTheDocument()
+    })
+    
+    // Click Try Again button
+    await user.click(screen.getByRole('button', { name: /try again/i }))
+    
+    // Verify form submits after successful retry
+    await waitFor(() => {
+      expect(mockOnSubmit).toHaveBeenCalledWith({
+        name: 'John Doe'
+      })
+    })
+  })
+
+  it('clears error state when microphone permission is granted via browser check', async () => {
+    const user = userEvent.setup()
+    mockGetUserMedia.mockRejectedValue(new Error('Permission denied'))
+    
+    const { rerender } = render(<WelcomeForm onSubmit={mockOnSubmit} />)
+    
+    // Enter name and submit
+    await user.type(screen.getByLabelText(/your name/i), 'John Doe')
+    await user.click(screen.getByRole('button', { name: /start recording/i }))
+    
+    // Wait for error modal
+    await waitFor(() => {
+      expect(screen.getByText(/microphone access required/i)).toBeInTheDocument()
+    })
+    
+    // Update compatibility state with microphone permission
+    rerender(
+      <WelcomeForm onSubmit={mockOnSubmit} />
+    )
+    
+    // Verify error modal is closed
+    await waitFor(() => {
+      expect(screen.queryByText(/microphone access required/i)).not.toBeInTheDocument()
+    })
+  })
+
+  it('shows loading state while checking microphone access', async () => {
+    const user = userEvent.setup()
+    mockGetUserMedia.mockImplementation(
+      () => new Promise((resolve) => setTimeout(() => resolve(new MediaStreamMock()), 100))
+    )
+    
+    render(<WelcomeForm onSubmit={mockOnSubmit} />)
+    
+    // Enter name and submit
+    await user.type(screen.getByLabelText(/your name/i), 'John Doe')
+    await user.click(screen.getByRole('button', { name: /start recording/i }))
+    
+    // Verify loading state
+    expect(screen.getByText(/checking microphone.../i)).toBeInTheDocument()
+    
+    // Wait for loading to complete
+    await waitFor(() => {
+      expect(screen.queryByText(/checking microphone.../i)).not.toBeInTheDocument()
+    })
+  })
 })

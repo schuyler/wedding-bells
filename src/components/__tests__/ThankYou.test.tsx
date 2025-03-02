@@ -29,7 +29,7 @@ describe('ThankYou Component', () => {
     expect(onRecordAnother).toHaveBeenCalledTimes(1)
   })
 
-  it('attempts to use the share API when the "Share" button is clicked', async () => {
+  it('successfully uses the share API when available', async () => {
     const onRecordAnother = vi.fn()
     render(<ThankYou guestName="Test Guest" onRecordAnother={onRecordAnother} />)
     const shareButton = screen.getByText('Share')
@@ -42,38 +42,55 @@ describe('ThankYou Component', () => {
       writable: true,
     })
 
-    // Mock the navigator.clipboard.writeText function
+    // Mock the share API
+    const mockShare = vi.fn().mockResolvedValue(undefined)
+    globalThis.navigator.share = mockShare
+
+    await fireEvent.click(shareButton)
+    
+    expect(mockShare).toHaveBeenCalledTimes(1)
+    expect(mockShare).toHaveBeenCalledWith({
+      title: 'Wedding Message Recorded',
+      text: 'I just recorded a message for Marc & Sea\'s wedding! 🎉 #WavesOfLove',
+      url: 'http://localhost:3000',
+    })
+  })
+
+  it('successfully uses clipboard API when share API is not available', async () => {
+    const onRecordAnother = vi.fn()
+    render(<ThankYou guestName="Test Guest" onRecordAnother={onRecordAnother} />)
+    const shareButton = screen.getByText('Share')
+
+    // Mock the window.location.href
+    Object.defineProperty(window, 'location', {
+      value: {
+        href: 'http://localhost:3000',
+      },
+      writable: true,
+    })
+
+    // Mock clipboard API
     const mockWriteText = vi.fn().mockResolvedValue(undefined)
     globalThis.navigator.clipboard.writeText = mockWriteText
 
-    // Mock the alert function
+    // Mock alert
     const mockAlert = vi.fn()
     globalThis.alert = mockAlert
 
-    let mockShare;
-    if (typeof globalThis.navigator.share !== 'undefined') {
-      mockShare = vi.fn();
-      globalThis.navigator.share = mockShare;
-    }
+    // Remove share API by making it undefined
+    Object.defineProperty(globalThis.navigator, 'share', {
+      value: undefined,
+      writable: true
+    })
 
-    // Test when share API is available
-    if (typeof globalThis.navigator.share !== 'undefined' && mockShare) {
-      mockShare.mockResolvedValue(undefined)
-      await fireEvent.click(shareButton)
-      expect(mockShare).toHaveBeenCalledTimes(1)
-      expect(mockShare).toHaveBeenCalledWith({
-        title: 'Wedding Message Recorded',
-        text: 'I just recorded a message for Marc & Sea\'s wedding! 🎉 #WavesOfLove',
-        url: 'http://localhost:3000',
-      })
-    } else {
-      // Test when share API is not available
-      await fireEvent.click(shareButton)
-      expect(mockWriteText).toHaveBeenCalledTimes(1)
-      expect(mockWriteText).toHaveBeenCalledWith(
-        `I just recorded a message for Marc & Sea's wedding! 🎉 #WavesOfLove\nhttp://localhost:3000`,
-      )
-    }
+    await fireEvent.click(shareButton)
+    
+    expect(mockWriteText).toHaveBeenCalledTimes(1)
+    expect(mockWriteText).toHaveBeenCalledWith(
+      `I just recorded a message for Marc & Sea's wedding! 🎉 #WavesOfLove\nhttp://localhost:3000`
+    )
+    expect(mockAlert).toHaveBeenCalledTimes(1)
+    expect(mockAlert).toHaveBeenCalledWith('Link copied to clipboard!')
   })
 
   it('displays an alert when the "Share" button is clicked and the share API is not available', async () => {
