@@ -1,0 +1,126 @@
+import { screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { vi, describe, it, beforeAll, afterEach, beforeEach, afterAll } from 'vitest'
+import { WelcomeForm } from '../WelcomeForm'
+import { MediaStreamMock } from '../../test/mocks/media-stream.mock'
+import { render } from '../../test/test-utils'
+import { useEffect } from 'react'
+
+// Mock getUserMedia API
+const mockGetUserMedia = vi.fn()
+// Mock console.error to keep test output clean
+const originalConsoleError = console.error
+beforeAll(() => {
+  console.error = vi.fn()
+  Object.defineProperty(navigator, 'mediaDevices', {
+    value: {
+      getUserMedia: mockGetUserMedia
+    },
+    writable: true
+  })
+})
+
+afterEach(() => {
+  mockGetUserMedia.mockReset()
+  vi.clearAllMocks()
+})
+
+afterAll(() => {
+  console.error = originalConsoleError
+})
+
+// Mock BrowserCheck component
+vi.mock('../BrowserCheck', () => ({
+  BrowserCheck: ({ onCompatibilityChange }: { onCompatibilityChange: (compat: any) => void }) => {
+    useEffect(() => {
+      onCompatibilityChange({
+        hasAudioSupport: true,
+        hasMicrophonePermission: false,
+        hasWaveSurferSupport: true
+      })
+    }, [onCompatibilityChange])
+    return null
+  }
+}))
+
+describe('WelcomeForm', () => {
+  const mockOnSubmit = vi.fn()
+
+  beforeEach(() => {
+    mockOnSubmit.mockReset()
+  })
+
+  it('renders the form with required elements', () => {
+    render(<WelcomeForm onSubmit={mockOnSubmit} />)
+    
+    // Verify heading
+    expect(screen.getByRole('heading', { name: /leave a message for marc & sea/i }))
+      .toBeInTheDocument()
+    
+    // Verify name input field
+    expect(screen.getByLabelText(/your name/i)).toBeInTheDocument()
+    
+    // Verify submit button
+    expect(screen.getByRole('button', { name: /start recording/i }))
+      .toBeInTheDocument()
+  })
+
+  it('shows validation error when submitting without a name', async () => {
+    const user = userEvent.setup()
+    render(<WelcomeForm onSubmit={mockOnSubmit} />)
+    
+    // Submit the form without entering a name
+    await user.click(screen.getByRole('button', { name: /start recording/i }))
+    
+    // Wait for and verify error message
+    await waitFor(() => {
+      expect(screen.getByText(/name must be at least 2 characters/i)).toBeInTheDocument()
+    })
+    
+    // Verify onSubmit was not called
+    expect(mockOnSubmit).not.toHaveBeenCalled()
+  })
+
+  it('shows error modal when microphone access is denied', async () => {
+    const user = userEvent.setup()
+    mockGetUserMedia.mockRejectedValue(new Error('Permission denied'))
+    render(<WelcomeForm onSubmit={mockOnSubmit} />)
+    
+    // Enter a valid name
+    await user.type(screen.getByLabelText(/your name/i), 'John Doe')
+    
+    // Submit the form
+    await user.click(screen.getByRole('button', { name: /start recording/i }))
+    
+    // Wait for error modal
+    await waitFor(() => {
+      expect(screen.getByText(/microphone access required/i)).toBeInTheDocument()
+      expect(screen.getByText(/please allow microphone access/i)).toBeInTheDocument()
+    })
+    
+    // Verify onSubmit was not called
+    expect(mockOnSubmit).not.toHaveBeenCalled()
+  })
+
+  it('submits form successfully with valid name', async () => {
+    const user = userEvent.setup()
+    mockGetUserMedia.mockResolvedValue(new MediaStreamMock())
+    render(<WelcomeForm onSubmit={mockOnSubmit} />)
+    
+    // Enter a valid name
+    await user.type(screen.getByLabelText(/your name/i), 'John Doe')
+    
+    // Submit the form
+    await user.click(screen.getByRole('button', { name: /start recording/i }))
+    
+    // Wait for microphone check to complete and form to submit
+    await waitFor(() => {
+      expect(mockOnSubmit).toHaveBeenCalledWith({
+        name: 'John Doe'
+      })
+    })
+    
+    // Verify getUserMedia was called with audio
+    expect(mockGetUserMedia).toHaveBeenCalledWith({ audio: true })
+  })
+})
