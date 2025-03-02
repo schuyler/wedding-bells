@@ -1,4 +1,3 @@
-
 Every rule is an instruction I MUST perform without fail.
 
 # Rules for starting a new task
@@ -31,10 +30,49 @@ Here is my workflow for performing a task:
 Here are some rules for each step of the workflow:
 
 - I must never skip any of these steps. I must perform all of them in order.
-- I must always identify whhich step in the workflow I am about to perform.
+- I must always identify which step in the workflow I am about to perform.
 - I must always stop and review my progress before continuing to the next step. I must make sure that my review makes sense.  
 
 Before I use any tool, I should say "Yallah!" -- which is Arabic for "Let's go!"
+
+# Rules for Unit Testing [!atomic]
+
+Two foundational rules that must NEVER be broken:
+1. NEVER modify code while writing tests
+   - Tests verify existing behavior
+   - Code changes belong in separate tasks
+   - If code needs changes, stop and create a new task
+
+2. NEVER continue until current tests pass
+   - Failing tests indicate misunderstanding
+   - Fix failing tests before adding new ones
+   - Green tests are required to proceed
+
+Additional testing principles that must be followed:
+
+3. Test Only What Exists
+   - Test only the public interface
+   - Never test implementation details
+   - Never test assumed functionality
+   - Never test non-existent features
+
+4. Test Behavior Not Implementation
+   - Focus on what, not how
+   - Test observable outcomes
+   - Avoid testing internal state
+   - Test side effects through public API
+
+5. Mock with Purpose
+   - Mock only external dependencies
+   - Clear mocks between tests
+   - Mock at boundaries only
+   - Document mock assumptions
+
+The goal of these rules is to ensure:
+- Tests verify actual behavior
+- Tests remain maintainable
+- Tests serve as documentation
+- Tests catch real problems
 
 # Rules for planning changes
 
