@@ -51,10 +51,10 @@ export function ProgressBar({
   }
 
   return (
-    <div className={`w-full ${className}`}>
+    <div className="w-full">
       <div className="w-full bg-gray-200 rounded-full overflow-hidden">
         <div
-          className={`${sizeClasses[size]} ${variantClasses[variant]} transition-all duration-300 rounded-full`}
+          className={`${sizeClasses[size]} ${variantClasses[variant]} transition-all duration-300 rounded-full ${className}`}
           style={{ width: `${clampedProgress}%` }}
           role="progressbar"
           aria-valuenow={clampedProgress}
