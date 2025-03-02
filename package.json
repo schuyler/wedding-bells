@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest --run --exclude worker",
+    "test": "vitest --exclude worker",
     "test:coverage": "vitest --coverage --exclude worker"
   },
   "dependencies": {
@@ -37,7 +37,7 @@
     "@typescript-eslint/eslint-plugin": "^8.25.0",
     "@typescript-eslint/parser": "^8.25.0",
     "@vitejs/plugin-react": "^4.3.4",
-    "@vitest/coverage-c8": "^0.33.0",
+    "@vitest/coverage-istanbul": "^3.0.7",
     "eslint": "^9.21.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.18",

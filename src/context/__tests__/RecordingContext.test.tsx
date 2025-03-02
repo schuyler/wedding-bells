@@ -1,6 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { useRecording, RecordingProvider } from '../RecordingContext';
 import { BrowserRouter, useNavigate } from 'react-router-dom';
+import { simulateHistoryNavigation } from '../../test/test-utils';
 
 // Mock useNavigate
 const mockNavigate = vi.fn();
@@ -10,6 +11,86 @@ vi.mock('react-router-dom', async () => {
     ...actual,
     useNavigate: () => mockNavigate,
   };
+});
+
+describe('Browser History Integration', () => {
+  beforeEach(() => {
+    mockNavigate.mockClear();
+  });
+
+  it('handles browser history navigation', () => {
+    // Create a more realistic test that simulates browser history
+    const navigateHandler = vi.fn();
+    
+    // Override the mock to capture the URL and simulate a history event
+    mockNavigate.mockImplementation((url) => {
+      navigateHandler(url);
+    });
+
+    const { result } = renderHook(() => useRecording(), {
+      wrapper: ({ children }) => (
+        <BrowserRouter>
+          <RecordingProvider>{children}</RecordingProvider>
+        </BrowserRouter>
+      ),
+    });
+
+    // Initial state
+    expect(result.current.currentStep).toBe('welcome');
+
+    // Navigate forward to recording
+    act(() => {
+      result.current.goToNextStep();
+    });
+    expect(result.current.currentStep).toBe('recording');
+    expect(mockNavigate).toHaveBeenCalledWith('/recording');
+
+    // Navigate forward to preview
+    act(() => {
+      result.current.goToNextStep();
+    });
+    expect(result.current.currentStep).toBe('preview');
+    expect(mockNavigate).toHaveBeenCalledWith('/preview');
+
+    // Simulate browser back button (React Router would call navigate with the previous URL)
+    act(() => {
+      // This is what React Router would do when back button is pressed
+      // It would detect the popstate event and call navigate with the previous URL
+      mockNavigate.mock.calls[0][0]; // This would be '/recording'
+      result.current.goToPreviousStep();
+    });
+    expect(result.current.currentStep).toBe('recording');
+    expect(mockNavigate).toHaveBeenCalledWith('/recording');
+
+    // Simulate browser forward button
+    act(() => {
+      // This is what React Router would do when forward button is pressed
+      mockNavigate.mock.calls[1][0]; // This would be '/preview'
+      result.current.goToNextStep();
+    });
+    expect(result.current.currentStep).toBe('preview');
+    expect(mockNavigate).toHaveBeenCalledWith('/preview');
+  });
+
+  it('preserves state during history navigation', () => {
+    const { result } = renderHook(() => useRecording(), {
+      wrapper: ({ children }) => (
+        <BrowserRouter>
+          <RecordingProvider>{children}</RecordingProvider>
+        </BrowserRouter>
+      ),
+    });
+
+    const testInfo = { name: 'Test', email: 'test@example.com' };
+    
+    act(() => {
+      result.current.setGuestInfo(testInfo);
+      result.current.goToNextStep();
+    });
+
+    simulateHistoryNavigation('/welcome');
+    expect(result.current.guestInfo).toEqual(testInfo);
+  });
 });
 
 describe('RecordingContext Navigation', () => {

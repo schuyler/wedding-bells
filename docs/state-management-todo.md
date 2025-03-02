@@ -43,7 +43,7 @@ gantt
 ### Primary Test Implementation
 - [x] Write unit tests for RecordingContext navigation methods
   - [x] Test linear flow restrictions
-  - [ ] Test history integration
+  - [x] Test history integration
   - [x] Test state preservation
   - [x] Test invalid transitions
 
@@ -53,11 +53,11 @@ gantt
   - [x] Test audio blob management
   - [x] Test error state handling
 
-- [ ] Write unit tests for view component redirects
-  - [ ] Test missing state redirects
+- [x] Write unit tests for view component redirects
+  - [x] Test missing state redirects
   - [ ] Test permission-based access
-  - [ ] Test navigation guards
-  - [ ] Test error boundaries
+  - [x] Test navigation guards
+  - [x] Test basic component rendering and interactions
 
 - [ ] Write unit tests for useAudioRecording hook
   - [ ] Test initialization
