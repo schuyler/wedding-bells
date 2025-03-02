@@ -139,6 +139,71 @@ describe('WaveformVisualizer', () => {
       // Verify the Record plugin's startRecording method was called
       expect(mockRecordPluginInstance.startRecording).toHaveBeenCalled();
     });
+
+    it('logs errors when stopRecording fails', async () => {
+      const ref = createRef<WaveSurferControls>();
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      render(<WaveformVisualizer ref={ref} />);
+
+      // Set up recording state
+      const recordStartCallback = eventCallbacks.recordPlugin.get('record-start')!;
+      await act(async () => {
+        recordStartCallback();
+      });
+
+      // Configure mock to throw error
+      const error = new Error('Failed to stop recording');
+      mockRecordPluginInstance.stopRecording.mockImplementation(() => {
+        throw error;
+      });
+      mockRecordPluginInstance.isRecording.mockReturnValue(true);
+
+      // Call stopRecording on the ref and verify error was logged
+      await expect(ref.current!.stopRecording()).rejects.toThrow(error);
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to stop recording:', error);
+
+      // Restore console spies
+      consoleErrorSpy.mockRestore();
+      consoleLogSpy.mockRestore();
+    });
+
+    it('exposes pauseRecording method via ref', async () => {
+      const ref = createRef<WaveSurferControls>();
+      render(<WaveformVisualizer ref={ref} />);
+
+      // Simulate recording state
+      const recordStartCallback = eventCallbacks.recordPlugin.get('record-start')!;
+      await act(async () => {
+        recordStartCallback();
+      });
+
+      // Call pauseRecording via ref
+      ref.current?.pauseRecording();
+
+      // Verify the Record plugin's pauseRecording method was called
+      expect(mockRecordPluginInstance.pauseRecording).toHaveBeenCalled();
+    });
+
+    it('exposes resumeRecording method via ref', async () => {
+      const ref = createRef<WaveSurferControls>();
+      render(<WaveformVisualizer ref={ref} />);
+
+      // Simulate recording and paused state
+      const recordStartCallback = eventCallbacks.recordPlugin.get('record-start')!;
+      const recordPauseCallback = eventCallbacks.recordPlugin.get('record-pause')!;
+      
+      await act(async () => {
+        recordStartCallback();
+        recordPauseCallback();
+      });
+
+      // Call resumeRecording via ref
+      ref.current?.resumeRecording();
+
+      // Verify the Record plugin's resumeRecording method was called
+      expect(mockRecordPluginInstance.resumeRecording).toHaveBeenCalled();
+    });
   });
 
   // Tests for event handling
@@ -211,6 +276,33 @@ describe('WaveformVisualizer', () => {
       expect(onPlaybackComplete).toHaveBeenCalled();
     });
     
+    it('stops recording when maxDuration is reached', async () => {
+      const maxDuration = 10;
+      render(<WaveformVisualizer maxDuration={maxDuration} />);
+
+      // Set up recording state
+      const recordStartCallback = eventCallbacks.recordPlugin.get('record-start')!;
+      await act(async () => {
+        recordStartCallback();
+      });
+
+      // Ensure stopRecording doesn't throw in this test
+      mockRecordPluginInstance.stopRecording.mockImplementation(() => Promise.resolve());
+      mockRecordPluginInstance.isRecording.mockReturnValue(true);
+
+      // Get the record-progress callback
+      const recordProgressCallback = eventCallbacks.recordPlugin.get('record-progress')!;
+      expect(recordProgressCallback).toBeDefined();
+
+      // Trigger the callback with the max duration
+      await act(async () => {
+        recordProgressCallback(maxDuration);
+      });
+
+      // Verify stopRecording was called
+      expect(mockRecordPluginInstance.stopRecording).toHaveBeenCalled();
+    });
+
     it('does not stop recording if duration is within limit', () => {
       render(<WaveformVisualizer maxDuration={20} />);
       
@@ -270,14 +362,65 @@ describe('WaveformVisualizer', () => {
 
   // Tests for UI rendering
   describe('UI rendering', () => {
-    it('renders with correct ARIA attributes', () => {
+    it('renders with correct ARIA attributes in different states', async () => {
       const { container } = render(<WaveformVisualizer />);
-      const waveformContainer = container.querySelector('[role="button"]');
       
-      expect(waveformContainer).not.toBeNull();
+      // Initial state
+      let waveformContainer = container.querySelector('[role="button"]');
       expect(waveformContainer).toHaveAttribute('aria-label', 'Waveform placeholder');
+      
+      // Recording state
+      const recordStartCallback = eventCallbacks.recordPlugin.get('record-start')!;
+      await act(async () => {
+        recordStartCallback();
+      });
+      
+      waveformContainer = container.querySelector('[role="button"]');
+      expect(waveformContainer).toHaveAttribute('aria-label', 'Audio waveform visualization');
+      
+      // Playback state after recording
+      const recordEndCallback = eventCallbacks.recordPlugin.get('record-end')!;
+      const mockBlob = new Blob(['mock audio data'], { type: 'audio/webm' });
+      
+      await act(async () => {
+        recordEndCallback(mockBlob);
+      });
+      
+      waveformContainer = container.querySelector('[role="button"]');
+      expect(waveformContainer).toHaveAttribute('aria-label', 'Play audio');
     });
     
+    it('renders ready state message when not recording', () => {
+      const { getByText } = render(<WaveformVisualizer />);
+      expect(getByText('Ready to record')).toBeInTheDocument();
+    });
+    
+    it('renders play/pause button only after recording', async () => {
+      const { container, queryByLabelText } = render(<WaveformVisualizer />);
+      
+      // Initially, play button should not be present
+      expect(queryByLabelText('Play')).not.toBeInTheDocument();
+      
+      // After recording
+      const recordEndCallback = eventCallbacks.recordPlugin.get('record-end')!;
+      const mockBlob = new Blob(['mock audio data'], { type: 'audio/webm' });
+      
+      await act(async () => {
+        recordEndCallback(mockBlob);
+      });
+      
+      // Play button should be visible
+      expect(queryByLabelText('Play')).toBeInTheDocument();
+      
+      // Click to play
+      await act(async () => {
+        fireEvent.click(container.querySelector('button[aria-label="Play"]')!);
+      });
+      
+      // Should change to pause button
+      expect(queryByLabelText('Pause')).toBeInTheDocument();
+    });
+
     it('renders with custom className', () => {
       const { container } = render(<WaveformVisualizer className="custom-class" />);
       expect(container.firstChild).toHaveClass('custom-class');

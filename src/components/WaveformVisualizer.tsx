@@ -40,7 +40,7 @@ interface WaveformVisualizerProps {
  */
 export interface WaveSurferControls {
   startRecording: () => Promise<void>
-  stopRecording: () => void
+  stopRecording: () => Promise<void>
   pauseRecording: () => void
   resumeRecording: () => void
 }
@@ -112,6 +112,7 @@ export const WaveformVisualizer = forwardRef<WaveSurferControls, WaveformVisuali
       }
     } catch (err) {
       console.error('Failed to stop recording:', err)
+      console.log("Error caught in stopRecording:", err);
       throw err
     }
   }, [isRecording])
@@ -244,10 +245,8 @@ export const WaveformVisualizer = forwardRef<WaveSurferControls, WaveformVisuali
         await recordPlugin.current.startRecording()
       }
     },
-    stopRecording: () => {
-      if (recordPlugin.current && isRecording) {
-        recordPlugin.current.stopRecording()
-      }
+    stopRecording: async () => {
+      return stopRecording()
     },
     pauseRecording: () => {
       if (recordPlugin.current && isRecording && !isPaused) {
@@ -259,7 +258,7 @@ export const WaveformVisualizer = forwardRef<WaveSurferControls, WaveformVisuali
         recordPlugin.current.resumeRecording()
       }
     }
-  }), [isRecording, isPaused])
+  }), [isRecording, isPaused, stopRecording])
 
   return (
     <div className={`relative ${className}`}>
