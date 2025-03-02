@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest --exclude worker",
+    "test": "vitest --run --exclude worker",
     "test:coverage": "vitest --coverage --exclude worker"
   },
   "dependencies": {
