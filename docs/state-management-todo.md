@@ -14,36 +14,65 @@ gantt
     Testing/Refinement       :p4, after p3, 1d
 ```
 
-## Phase 1: React Router Setup
-- [*] Install react-router-dom@6.18+
-- [*] Create `src/views` directory structure
-- [ ] Convert App.tsx to use BrowserRouter
-- [ ] Add basic route guards
-- [ ] Write navigation smoke tests
+## Completed Items ✓
+- [x] Install react-router-dom@6.18+
+- [x] Create `src/views` directory structure
+- [x] Create `src/context/RecordingContext.tsx`
+- [x] Implement core state machine logic
+- [x] Add browser history integration
+- [x] Create view components for each route
+- [x] Convert App.tsx to use BrowserRouter
+- [x] Basic route guards implementation
 
-## Phase 2: Context Implementation
-- [ ] Create `src/context/RecordingContext.tsx` 
-- [ ] Implement core state machine logic
-- [ ] Add browser history integration
-- [ ] Create WaveSurferRecordingEngine service
-- [ ] Write context unit tests
+## Immediate Priority - Unit Testing
+- [ ] Write unit tests for RecordingContext navigation methods
+- [ ] Write unit tests for state transitions in RecordingContext
+- [ ] Write unit tests for view component redirects
+- [ ] Write unit tests for useAudioRecording hook
+- [ ] Write unit tests for utility functions in components
+- [ ] Create test harness for MediaStream mocking
+- [ ] Add test coverage reporting
 
-## Phase 3: Component Updates
-- [ ] Migrate AudioRecorder to use context
-- [ ] Update WaveformVisualizer imperative API
-- [ ] Create view components for each route
-- [ ] Add transition animations
-- [ ] Write component integration tests
+## High Priority - Recording Engine Abstraction
+- [ ] Create `src/services/RecordingEngine.ts` interface and implementation
+- [ ] Migrate MediaRecorder logic from WaveformVisualizer to RecordingEngine
+- [ ] Implement permission handling in RecordingEngine
+- [ ] Add unified error handling system
+- [ ] Create RecordingEngineProvider context
+- [ ] Update AudioRecorder to use RecordingEngine
+- [ ] Write unit tests for RecordingEngine
 
-## Phase 4: Testing
-- [ ] Implement navigation flow Cypress tests
-- [ ] Add recording state persistence checks
+## High Priority - WaveformVisualizer Integration
+- [ ] Refactor WaveformVisualizer to be purely presentational
+- [ ] Create WaveformVisualizerContext for state management
+- [ ] Implement declarative API for WaveformVisualizer
+- [ ] Add proper TypeScript interfaces for visualization state
+- [ ] Create visualization state reducer
+- [ ] Write integration tests for WaveformVisualizer
+
+## Testing & QA
+- [ ] Implement navigation flow tests
+- [ ] Test recording state persistence
 - [ ] Verify browser back/forward behavior
-- [ ] Update type definitions (`src/types`)
-- [ ] Document architecture changes
+- [ ] Error handling coverage
+- [ ] Test permission handling scenarios
+- [ ] Test visualization state management
+- [ ] Performance testing for visualization updates
+- [ ] Test audio quality and encoding
 
-## Quality Assurance
-- [ ] Performance profiling
-- [ ] Accessibility audit
-- [ ] Browser matrix testing
-- [ ] Error logging integration
+## Documentation
+- [ ] Update technical documentation with new architecture
+- [ ] Document RecordingEngine API
+- [ ] Document visualization state management
+- [ ] Add inline documentation for context usage
+- [ ] Document error handling approaches
+- [ ] Create example usage documentation
+- [ ] Update architecture diagrams
+
+## Future Improvements
+- [ ] Consider transition animations
+- [ ] Explore performance optimizations
+- [ ] Add comprehensive error logging
+- [ ] Consider WebAssembly for audio processing
+- [ ] Add support for different audio formats
+- [ ] Implement advanced waveform visualization options
