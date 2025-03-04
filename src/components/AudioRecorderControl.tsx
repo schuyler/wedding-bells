@@ -58,6 +58,10 @@ export const AudioRecorderControl = forwardRef<AudioRecorderControls, AudioRecor
     },
     ref
   ) => {
+    // Debug state
+    const [chunkCount, setChunkCount] = useState(0);
+    const [totalDataSize, setTotalDataSize] = useState(0);
+
     // Core refs for recording management
     const mediaRecorderRef = useRef<MediaRecorder | null>(null)
     const mediaStreamRef = useRef<MediaStream | null>(null)
@@ -187,6 +191,10 @@ export const AudioRecorderControl = forwardRef<AudioRecorderControls, AudioRecor
 
         mediaStreamRef.current = stream
         
+        // Reset debug counters
+        setChunkCount(0);
+        setTotalDataSize(0);
+
         // Setup MediaRecorder
         const mediaRecorder = new MediaRecorder(stream, {
           mimeType: 'audio/webm'
@@ -199,6 +207,11 @@ export const AudioRecorderControl = forwardRef<AudioRecorderControls, AudioRecor
         mediaRecorder.ondataavailable = (event) => {
           if (event.data.size > 0) {
             audioChunksRef.current.push(event.data)
+            
+            // Update debug information
+            setChunkCount(prev => prev + 1);
+            setTotalDataSize(prev => prev + event.data.size);
+            console.log(`Chunk #${chunkCount + 1} received, size: ${event.data.size} bytes`);
           }
         }
 
@@ -335,7 +348,18 @@ export const AudioRecorderControl = forwardRef<AudioRecorderControls, AudioRecor
       ]
     )
 
-    return <>{children}</>
+    return (
+      <>
+        {isRecording && (
+          <div className="bg-gray-100 p-2 rounded-md text-xs font-mono mt-2 mb-2">
+            <div>Recording Debug Info:</div>
+            <div>Chunks collected: {chunkCount}</div>
+            <div>Total data size: {totalDataSize} bytes</div>
+          </div>
+        )}
+        {children}
+      </>
+    )
   }
 )
 

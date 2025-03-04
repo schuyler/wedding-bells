@@ -16,6 +16,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 export interface VolumeConfig {
   minDecibels?: number
   maxDecibels?: number
+  debug?: boolean
 }
 
 /**
@@ -34,6 +35,14 @@ export interface UseAudioVolume {
   error?: Error
   initializeAnalysis: (mediaStream: MediaStream) => void
   stopAnalysis: () => void
+  debugValues: {
+    rawRms: number
+    dbValue: number
+    normalizedVolume: number
+    smoothedVolume: number
+    minDb: number
+    maxDb: number
+  }
 }
 
 /**
@@ -62,18 +71,32 @@ export interface UseAudioVolume {
  * @returns UseAudioVolume controller interface
  */
 export function useAudioVolume(config: VolumeConfig = {}): UseAudioVolume {
-  // Normalization range defaults based on architectural baselines
-  const minDb = config.minDecibels ?? -30 // Default: Quiet office environment
-  const maxDb = config.maxDecibels ?? 10  // Default: Raised voice level
+  // Normalization range defaults based on observed audio levels
+  const minDb = config.minDecibels ?? -50 // Extended to capture quieter sounds
+  const maxDb = config.maxDecibels ?? -10  // Adjusted for typical speech levels
   
   // State management for volume and errors
   const [currentVolume, setCurrentVolume] = useState(0)
   const [error, setError] = useState<Error>()
+  const [debugValues, setDebugValues] = useState({
+    rawRms: 0,
+    dbValue: 0,
+    normalizedVolume: 0,
+    smoothedVolume: 0,
+    minDb,
+    maxDb
+  })
 
   // Web Audio API references
   const audioContext = useRef<AudioContext | null>(null)
   const analyser = useRef<AnalyserNode | null>(null)
   const animationFrame = useRef<number | null>(null)
+  const lastVolumeRef = useRef(0)
+  const lastUpdateRef = useRef(0)
+
+  // Falloff configuration
+  const FALLOFF_DURATION = 200 // 200ms decay - faster falloff for more responsive visualization
+  const FALLOFF_FACTOR = Math.exp(Math.log(0.001) / FALLOFF_DURATION) // Decay to 0.1% in FALLOFF_DURATION
 
   /**
    * Clean shutdown procedure for audio resources
@@ -92,6 +115,13 @@ export function useAudioVolume(config: VolumeConfig = {}): UseAudioVolume {
     }
     analyser.current = null
     setCurrentVolume(0)
+    // Reset debug values
+    setDebugValues(prev => ({
+      ...prev,
+      rawRms: 0,
+      dbValue: 0,
+      normalizedVolume: 0
+    }))
   }, [])
 
   // Automatic cleanup on component unmount
@@ -158,7 +188,35 @@ export function useAudioVolume(config: VolumeConfig = {}): UseAudioVolume {
         const range = maxDb - minDb
         const normalizedVolume = Math.max(0, Math.min(1, (db - minDb) / range))
         
-        setCurrentVolume(normalizedVolume)
+        // Apply exponential falloff
+        const now = performance.now()
+        const timeDelta = now - lastUpdateRef.current
+        const decayMultiplier = Math.pow(FALLOFF_FACTOR, timeDelta)
+        
+        // If new volume is higher, use it directly; if lower, apply decay
+        const smoothedVolume = normalizedVolume > lastVolumeRef.current
+          ? normalizedVolume
+          : lastVolumeRef.current * decayMultiplier
+
+        // Update state and refs
+        setCurrentVolume(smoothedVolume)
+        lastVolumeRef.current = smoothedVolume
+        lastUpdateRef.current = now
+
+        // Update debug values with both raw and smoothed values
+        setDebugValues({
+          rawRms: rms,
+          dbValue: db,
+          normalizedVolume,
+          smoothedVolume,
+          minDb,
+          maxDb
+        })
+
+        // Debug logging (only if debug flag is set)
+        if (config.debug) {
+          console.log(`Audio Analysis: RMS=${rms.toFixed(6)}, dB=${db.toFixed(2)}, Volume=${normalizedVolume.toFixed(4)}`);
+        }
 
         // 5. Continue analysis loop
         animationFrame.current = requestAnimationFrame(updateVolume)
@@ -171,12 +229,13 @@ export function useAudioVolume(config: VolumeConfig = {}): UseAudioVolume {
       setError(err instanceof Error ? err : new Error('Audio analysis initialization failed'))
       stopAnalysis()
     }
-  }, [stopAnalysis])
+  }, [stopAnalysis, minDb, maxDb])
 
   return {
     currentVolume,
     error,
     initializeAnalysis,
-    stopAnalysis
+    stopAnalysis,
+    debugValues
   }
 }

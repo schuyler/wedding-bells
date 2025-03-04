@@ -55,7 +55,8 @@ export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderPr
     currentVolume, 
     error: volumeError, 
     initializeAnalysis, 
-    stopAnalysis 
+    stopAnalysis,
+    debugValues 
   } = useAudioVolume()
 
   // Sync volume analysis error with component error state
@@ -264,12 +265,26 @@ export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderPr
         </div>
 
         <div className="flex flex-col items-center space-y-4">
+        {/* Volume Analysis Debug Display */}
+        <div className="space-y-4">
           {/* Volume Level Indicator */}
           <VolumeIndicator 
             volume={isPaused ? 0 : currentVolume}
             size="lg"
-            className="mb-4 w-full max-w-md"
+            className="w-full max-w-md"
           />
+
+          {/* Debug Values Display (hidden by default) */}
+          {import.meta.env.DEV && (
+            <div className="bg-gray-100 p-2 rounded-md text-xs font-mono w-full max-w-md">
+              <div>Volume Analysis Debug:</div>
+              <div>Raw RMS: {debugValues.rawRms.toFixed(6)}</div>
+              <div>dB Value: {debugValues.dbValue.toFixed(2)} dB</div>
+              <div>Normalized Volume: {debugValues.normalizedVolume.toFixed(4)}</div>
+              <div>Range: {debugValues.minDb}dB to {debugValues.maxDb}dB</div>
+            </div>
+          )}
+        </div>
 
           {/* Recording Timer */}
           {isRecording && (
