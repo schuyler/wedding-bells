@@ -48,7 +48,7 @@ interface ProgressIndicatorProps {
  */
 export function ProgressIndicator({
   currentState,
-  states = ['welcome', 'recording', 'preview', 'upload', 'thankyou']
+  states = ['welcome', 'recording', 'upload', 'thankyou']
 }: ProgressIndicatorProps) {
   return (
     <div className="flex flex-col items-center space-y-3">

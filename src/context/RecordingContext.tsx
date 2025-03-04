@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export type RecordingState = 'welcome' | 'recording' | 'preview' | 'upload' | 'thankyou';
+export type RecordingState = 'welcome' | 'recording' | 'upload' | 'thankyou';
 export type GuestInfo = { name: string; email: string };
 
 interface RecordingContextType {
@@ -29,7 +29,7 @@ export const RecordingProvider = ({ children }: { children: ReactNode }) => {
   const [isPaused, setIsPaused] = useState(false);
   const navigate = useNavigate();
 
-  const STEPS: RecordingState[] = ['welcome', 'recording', 'preview', 'upload', 'thankyou'];
+  const STEPS: RecordingState[] = ['welcome', 'recording', 'upload', 'thankyou'];
 
   const goToNextStep = useCallback(() => {
     const currentIndex = STEPS.indexOf(currentStep);

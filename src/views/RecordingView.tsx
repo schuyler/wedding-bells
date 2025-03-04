@@ -12,7 +12,7 @@ import { useRecording } from '../context/RecordingContext';
  * 1. Displays audio recorder interface
  * 2. On recording completion:
  *    - Saves audio blob to context
- *    - Navigates to preview screen
+ *    - Navigates directly to upload screen
  * 3. On cancel:
  *    - Resets flow to welcome screen
  * 
@@ -28,7 +28,7 @@ export function RecordingView(): React.ReactElement {
    */
   const handleRecordingComplete = (blob: Blob): void => {
     setAudioBlob(blob);  // Save blob to context
-    goToNextStep();      // Navigate to preview
+    goToNextStep();      // Navigate directly to upload
   };
 
   return (

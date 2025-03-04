@@ -45,12 +45,12 @@ describe('Browser History Integration', () => {
     expect(result.current.currentStep).toBe('recording');
     expect(mockNavigate).toHaveBeenCalledWith('/recording');
 
-    // Navigate forward to preview
+    // Navigate forward to upload
     act(() => {
       result.current.goToNextStep();
     });
-    expect(result.current.currentStep).toBe('preview');
-    expect(mockNavigate).toHaveBeenCalledWith('/preview');
+    expect(result.current.currentStep).toBe('upload');
+    expect(mockNavigate).toHaveBeenCalledWith('/upload');
 
     // Simulate browser back button (React Router would call navigate with the previous URL)
     act(() => {
@@ -65,11 +65,11 @@ describe('Browser History Integration', () => {
     // Simulate browser forward button
     act(() => {
       // This is what React Router would do when forward button is pressed
-      mockNavigate.mock.calls[1][0]; // This would be '/preview'
+      mockNavigate.mock.calls[1][0]; // This would be '/upload'
       result.current.goToNextStep();
     });
-    expect(result.current.currentStep).toBe('preview');
-    expect(mockNavigate).toHaveBeenCalledWith('/preview');
+    expect(result.current.currentStep).toBe('upload');
+    expect(mockNavigate).toHaveBeenCalledWith('/upload');
   });
 
   it('preserves state during history navigation', () => {
@@ -116,12 +116,6 @@ describe('RecordingContext Navigation', () => {
     act(() => {
       result.current.goToNextStep();
     });
-    expect(result.current.currentStep).toBe('preview');
-    expect(mockNavigate).toHaveBeenCalledWith('/preview');
-
-    act(() => {
-      result.current.goToNextStep();
-    });
     expect(result.current.currentStep).toBe('upload');
     expect(mockNavigate).toHaveBeenCalledWith('/upload');
 
@@ -136,7 +130,7 @@ describe('RecordingContext Navigation', () => {
       result.current.goToNextStep();
     });
     expect(result.current.currentStep).toBe('thankyou'); // Should remain at thank-you
-    expect(mockNavigate).toHaveBeenCalledTimes(4); // No additional navigation
+    expect(mockNavigate).toHaveBeenCalledTimes(3); // No additional navigation
   });
 
   it('restricts invalid transitions', () => {
@@ -228,12 +222,6 @@ describe('RecordingContext Navigation', () => {
       result.current.goToNextStep();
     });
     expect(result.current.currentStep).toBe('recording');
-
-    // Try to go to preview without audio
-    act(() => {
-      result.current.goToNextStep();
-    });
-    expect(result.current.currentStep).toBe('preview');
 
     // Set up required state
     act(() => {

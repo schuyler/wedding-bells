@@ -18,7 +18,7 @@ export interface AudioUploadResponse {
 }
 
 // States for the recording process
-export type RecordingState = 'welcome' | 'recording' | 'preview' | 'upload' | 'thankyou'
+export type RecordingState = 'welcome' | 'recording' | 'upload' | 'thankyou'
 
 // Configuration for audio recording
 export interface AudioConfig {

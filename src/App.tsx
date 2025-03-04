@@ -5,7 +5,6 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import { RecordingProvider } from './context/RecordingContext';
 import { WelcomeView } from './views/WelcomeView';
 import { RecordingView } from './views/RecordingView';
-import { PreviewView } from './views/PreviewView';
 import { UploadView } from './views/UploadView';
 import { ThankYouView } from './views/ThankYouView';
 import { ProgressIndicator } from './components/ProgressIndicator';
@@ -37,7 +36,6 @@ function AppContent() {
                 <Route path="/" element={<Navigate to="/welcome" />} />
                 <Route path="/welcome" element={<WelcomeView />} />
                 <Route path="/recording" element={<RecordingView />} />
-                <Route path="/preview" element={<PreviewView />} />
                 <Route path="/upload" element={<UploadView />} />
                 <Route path="/thankyou" element={<ThankYouView />} />
                 <Route path="*" element={<Navigate to="/welcome" />} />
@@ -65,9 +63,8 @@ function AppContent() {
  * Application Flow:
  * 1. Welcome (guest info collection)
  * 2. Recording (audio capture)
- * 3. Preview (audio review)
- * 4. Upload (progress tracking)
- * 5. Thank You (confirmation)
+ * 3. Upload (progress tracking)
+ * 4. Thank You (confirmation)
  */
 function App() {
   return (
