@@ -168,7 +168,11 @@ export const AudioRecorderControl = forwardRef<AudioRecorderControls, AudioRecor
       // Check and request permission if needed
       if (!permissionState) {
         const granted = await checkPermission()
-        if (!granted) throw new Error('Permission required')
+        if (!granted) {
+          // Instead of throwing, call the error callback
+          onError?.(new Error('Permission required'))
+          return null
+        }
       }
 
       try {
