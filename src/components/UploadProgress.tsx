@@ -29,10 +29,10 @@ interface UploadProgressProps {
  * 
  * This component provides visual feedback during the file upload process, showing
  * progress percentage, current status, and handling error states. It represents
- * the fourth step in the overall recording flow (welcome → recording → preview → upload → thank you).
- * 
+ * the third step in the overall recording flow (welcome → recording → upload → thank you).
+ *
  * Application Flow Integration:
- * - Appears after a user finishes recording and previewing their message
+ * - Appears after a user finishes recording their message
  * - When upload completes (progress reaches 100%), shows a continue button
  * - Continue button triggers onComplete callback which transitions to the thank you state
  * - On error, displays error modal with retry option if onRetry is provided
