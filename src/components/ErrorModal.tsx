@@ -111,8 +111,10 @@ export function ErrorModal({
                   max-w-md
                   transform
                   overflow-hidden
-                  rounded-2xl
-                  bg-white
+                  rounded-sm
+                  bg-wedding-dark
+                  border
+                  border-wedding-light/40
                   p-4
                   sm:p-6
                   text-left
@@ -125,7 +127,7 @@ export function ErrorModal({
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0">
                     <svg
-                      className="h-6 w-6 text-red-500"
+                      className="h-6 w-6 text-red-400"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -142,13 +144,13 @@ export function ErrorModal({
                   <div className="flex-1 min-w-0">
                     <Dialog.Title
                       as="h3"
-                      className="text-base sm:text-lg font-semibold leading-6 text-gray-900"
+                      className="text-base sm:text-lg uppercase tracking-heading font-medium text-wedding-light"
                     >
                       {title}
                     </Dialog.Title>
                     
                     <div className="mt-2">
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-wedding-light/80 font-eb-garamond">
                         {description}
                       </p>
                       {children}
@@ -175,18 +177,22 @@ export function ErrorModal({
                       inline-flex
                       justify-center
                       items-center
-                      rounded-lg
+                      rounded-sm
                       px-4
                       py-2.5
                       sm:py-2
                       text-sm
+                      uppercase
+                      tracking-wedding
                       font-medium
-                      text-gray-900
-                      bg-gray-100
-                      hover:bg-gray-200
+                      bg-transparent
+                      border
+                      border-wedding-light/50
+                      text-wedding-light
+                      hover:bg-wedding-light/20
                       focus:outline-none
-                      focus-visible:ring-2
-                      focus-visible:ring-gray-500
+                      focus-visible:ring-1
+                      focus-visible:ring-wedding-light
                       focus-visible:ring-offset-2
                       transition-colors
                       min-h-[44px]
@@ -205,18 +211,20 @@ export function ErrorModal({
                         inline-flex
                         justify-center
                         items-center
-                        rounded-lg
+                        rounded-sm
                         px-4
                         py-2.5
                         sm:py-2
                         text-sm
+                        uppercase
+                        tracking-wedding
                         font-medium
-                        text-white
-                        bg-blue-500
-                        hover:bg-blue-600
+                        bg-wedding-light
+                        text-wedding-dark
+                        hover:bg-white
                         focus:outline-none
-                        focus-visible:ring-2
-                        focus-visible:ring-blue-500
+                        focus-visible:ring-1
+                        focus-visible:ring-wedding-light
                         focus-visible:ring-offset-2
                         transition-colors
                         min-h-[44px]

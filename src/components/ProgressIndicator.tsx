@@ -66,8 +66,8 @@ export function ProgressIndicator({
                     -translate-y-1/2
                     transition-colors
                     ${index < states.indexOf(currentState)
-                      ? 'bg-blue-500'
-                      : 'bg-gray-300'
+                      ? 'bg-wedding-light'
+                      : 'bg-wedding-light/30'
                     }
                   `}
                 />
@@ -79,8 +79,8 @@ export function ProgressIndicator({
                   rounded-full
                   transition-colors
                   ${index <= states.indexOf(currentState)
-                    ? 'bg-blue-500'
-                    : 'bg-gray-300'
+                    ? 'bg-wedding-light'
+                    : 'bg-wedding-light/30'
                   }
                 `}
               />
@@ -90,12 +90,12 @@ export function ProgressIndicator({
       </div>
 
       {/* Step Counter */}
-      <div className="text-xs sm:text-sm text-gray-600">
-        Step {states.indexOf(currentState) + 1} of {states.length}
+      <div className="text-xs sm:text-sm text-wedding-light/70 font-eb-garamond tracking-wider">
+        STEP {states.indexOf(currentState) + 1} OF {states.length}
       </div>
 
       {/* Step Label - Custom transformation for welcome state */}
-      <div className="text-sm sm:text-base font-medium text-gray-800 capitalize">
+      <div className="text-sm sm:text-base font-medium text-wedding-light uppercase tracking-wedding">
         {currentState === 'welcome' ? 'Get Started' : currentState}
       </div>
     </div>

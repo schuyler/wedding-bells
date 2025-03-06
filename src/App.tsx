@@ -21,9 +21,9 @@ function AppContent() {
   });
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-white p-4">
-      <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg p-4 sm:p-6 md:p-8">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-4 sm:mb-6 md:mb-8 text-gray-800">
+    <main className="min-h-screen flex items-center justify-center bg-wedding-dark p-4">
+      <div className="w-full max-w-2xl bg-wedding-dark border border-wedding-light/30 rounded-lg shadow-lg p-4 sm:p-6 md:p-8">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl text-center mb-4 sm:mb-6 md:mb-8 text-wedding-light tracking-heading">
           Marc & Sea's Wedding
         </h1>
 

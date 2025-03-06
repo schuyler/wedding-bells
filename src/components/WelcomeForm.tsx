@@ -146,18 +146,18 @@ export function WelcomeForm({ onSubmit, defaultValues }: WelcomeFormProps) {
       )}
 
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">
+        <h2 className="text-xl md:text-2xl mb-3">
           Record a message for the wedding podcast
         </h2>
-        <p className="text-gray-600">
+        <p className="text-wedding-light/80 font-eb-garamond">
           Share your favorite memory, well wishes, or advice for the newlyweds!
         </p>
       </div>
 
       <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-            Your Name
+          <label htmlFor="name" className="block text-sm font-medium text-wedding-light mb-1 tracking-wider">
+            YOUR NAME
           </label>
           <input
             type="text"
@@ -165,37 +165,37 @@ export function WelcomeForm({ onSubmit, defaultValues }: WelcomeFormProps) {
             {...register('name')}
             autoComplete="off"
             disabled={isChecking || isSubmitting}
-            className={`w-full px-4 py-2 rounded-lg border ${
-              errors.name ? 'border-red-500' : 'border-gray-300'
-            } focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500`}
+            className={`w-full px-4 py-2 rounded-sm bg-wedding-dark border ${
+              errors.name ? 'border-red-400' : 'border-wedding-light/50'
+            } focus:outline-none focus:ring-1 focus:ring-wedding-light text-wedding-light font-eb-garamond disabled:bg-wedding-dark/70 disabled:text-wedding-light/50`}
             placeholder="Enter your name"
           />
           {errors.name && (
-            <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>
+            <p className="mt-1 text-sm text-red-400">{errors.name.message}</p>
           )}
         </div>
 
         <button
           type="submit"
           disabled={isChecking || isSubmitting}
-          className={`w-full py-3 px-4 rounded-lg text-white font-medium transition-colors flex justify-center items-center space-x-2 ${
+          className={`w-full py-3 px-4 rounded-sm font-medium tracking-wedding flex justify-center items-center space-x-2 ${
             isChecking || isSubmitting
-              ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-blue-500 hover:bg-blue-600'
+              ? 'bg-wedding-light/30 text-wedding-dark/50 cursor-not-allowed'
+              : 'bg-wedding-light text-wedding-dark hover:bg-white'
           }`}
         >
           {isChecking || isSubmitting ? (
             <>
-              <LoadingSpinner size="sm" light />
+              <LoadingSpinner size="sm" light={false} />
               <span>{isChecking ? 'Checking Microphone...' : 'Continuing...'}</span>
             </>
           ) : (
-            'Continue'
+            'CONTINUE'
           )}
         </button>
       </form>
 
-      <p className="text-sm text-gray-500 text-center">
+      <p className="text-sm text-wedding-light/70 text-center font-eb-garamond">
         You'll have up to 15 minutes to record your message
       </p>
 

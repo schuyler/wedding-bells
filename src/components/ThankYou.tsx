@@ -76,9 +76,9 @@ export function ThankYou({ guestName, onRecordAnother }: ThankYouProps) {
   return (
     <div className="text-center space-y-6">
       <div className="flex justify-center">
-        <div className="rounded-full bg-green-100 p-3">
+        <div className="rounded-full bg-wedding-light/10 p-3 border border-wedding-light/30">
           <svg
-            className="w-12 h-12 text-green-500"
+            className="w-12 h-12 text-wedding-light"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -94,10 +94,10 @@ export function ThankYou({ guestName, onRecordAnother }: ThankYouProps) {
       </div>
 
       <div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">
+        <h2 className="text-2xl tracking-heading uppercase mb-2">
           Thank You, {guestName}!
         </h2>
-        <p className="text-gray-600">
+        <p className="text-wedding-light/80 font-eb-garamond">
           Your message has been recorded and will be cherished by Marc & Sea.
         </p>
       </div>
@@ -105,13 +105,13 @@ export function ThankYou({ guestName, onRecordAnother }: ThankYouProps) {
       <div className="flex flex-col sm:flex-row justify-center gap-4">
         <button
           onClick={onRecordAnother}
-          className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-lg transition-colors"
+          className="bg-wedding-light hover:bg-white text-wedding-dark font-medium py-2 px-6 rounded-sm uppercase tracking-wedding transition-colors"
         >
-          Record Another Message
+          Record Another
         </button>
         <button
           onClick={handleShare}
-          className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+          className="bg-transparent hover:bg-wedding-light/20 text-wedding-light border border-wedding-light/50 font-medium py-2 px-6 rounded-sm uppercase tracking-wedding transition-colors flex items-center justify-center gap-2"
         >
           <svg
             className="w-5 h-5"
@@ -130,7 +130,7 @@ export function ThankYou({ guestName, onRecordAnother }: ThankYouProps) {
         </button>
       </div>
 
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-wedding-light/60 font-eb-garamond">
         Want to view all messages? Check back after the wedding!
       </p>
     </div>

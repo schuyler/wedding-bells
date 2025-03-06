@@ -21,10 +21,10 @@ describe('ThankYou Component', () => {
     expect(screen.getByText('Thank You, Test Guest!')).toBeInTheDocument()
   })
 
-  it('calls the onRecordAnother function when the "Record Another Message" button is clicked', () => {
+  it('calls the onRecordAnother function when the "Record Another" button is clicked', () => {
     const onRecordAnother = vi.fn()
     render(<ThankYou guestName="Test Guest" onRecordAnother={onRecordAnother} />)
-    const recordAnotherButton = screen.getByText('Record Another Message')
+    const recordAnotherButton = screen.getByText('Record Another')
     fireEvent.click(recordAnotherButton)
     expect(onRecordAnother).toHaveBeenCalledTimes(1)
   })

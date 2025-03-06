@@ -21,7 +21,10 @@ describe('ProgressIndicator', () => {
 
   it('displays the correct step counter', () => {
     render(<ProgressIndicator currentState="upload" states={['welcome', 'recording', 'upload', 'thankyou']} />)
-    expect(screen.getByText('Step 3 of 4')).toBeInTheDocument()
+    // Use a function to match text split across multiple elements
+    expect(screen.getByText((_, element) => {
+      return element?.textContent === 'STEP 3 OF 4'
+    })).toBeInTheDocument()
   })
 
   it('displays the correct step label', () => {

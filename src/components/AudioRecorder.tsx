@@ -259,10 +259,10 @@ export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderPr
 
         {/* Recording status header */}
         <div className="text-center">
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">
-            {isRecording ? 'Recording in Progress' : 'Ready to Record'}
+          <h3 className="text-xl font-medium tracking-heading mb-2">
+            {isRecording ? 'RECORDING IN PROGRESS' : 'READY TO RECORD'}
           </h3>
-          <p className="text-gray-600">
+          <p className="text-wedding-light/80 font-eb-garamond">
             {isRecording
               ? isPaused
                 ? 'Recording paused'
@@ -285,7 +285,7 @@ export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderPr
 
               {/* Debug Values Display (disabled but preserved) */}
               {false && import.meta.env.DEV && (
-                <div className="bg-gray-100 p-2 rounded-md text-xs font-mono w-full max-w-xs mx-auto">
+                <div className="bg-wedding-dark p-2 rounded-md text-xs font-mono w-full max-w-xs mx-auto border border-wedding-light/30">
                   <div>Volume Analysis Debug:</div>
                   <div>Raw RMS: {debugValues.rawRms.toFixed(6)}</div>
                   <div>dB Value: {debugValues.dbValue.toFixed(2)} dB</div>
@@ -312,13 +312,13 @@ export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderPr
               <>
                 <button
                   onClick={startRecording}
-                  className="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-6 rounded-lg transition-colors"
+                  className="bg-wedding-light hover:bg-white text-wedding-dark font-medium py-2 px-6 rounded-sm tracking-wedding uppercase transition-colors"
                 >
                   Start Recording
                 </button>
                 <button
                   onClick={onCancel}
-                  className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors"
+                  className="bg-transparent hover:bg-wedding-light/20 text-wedding-light font-medium py-2 px-4 rounded-sm border border-wedding-light/50 tracking-wedding uppercase transition-colors"
                 >
                   Cancel
                 </button>
@@ -336,7 +336,7 @@ export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderPr
                       audioRecorderControlRef.current?.pauseRecording()
                     }
                   }}
-                  className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors"
+                  className="bg-transparent hover:bg-wedding-light/20 text-wedding-light font-medium py-2 px-4 rounded-sm border border-wedding-light/50 tracking-wedding uppercase transition-colors"
                 >
                   {isPaused ? 'Resume' : 'Pause'}
                 </button>
@@ -345,7 +345,7 @@ export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderPr
                     const blob = await audioRecorderControlRef.current?.stopRecording()
                     if (blob) handleRecordingComplete(blob)
                   }}
-                  className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-lg transition-colors"
+                  className="bg-wedding-light hover:bg-white text-wedding-dark font-medium py-2 px-6 rounded-sm tracking-wedding uppercase transition-colors"
                 >
                   Finish Recording
                 </button>

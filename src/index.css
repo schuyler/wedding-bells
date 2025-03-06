@@ -2,15 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import wedding fonts */
+@import url('https://fonts.googleapis.com/css2?family=Zen+Antique:wght@400&family=EB+Garamond:wght@300;400;500&display=swap');
+
 /* Base styles for the wedding website */
 @layer base {
   html {
-    font-family: Inter, system-ui, sans-serif;
+    font-family: 'EB Garamond', serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   body {
-    @apply min-h-screen bg-white text-gray-900;
+    @apply min-h-screen bg-wedding-dark text-wedding-light;
+  }
+
+  h1, h2, h3 {
+    @apply font-zen-antique uppercase tracking-heading;
+  }
+
+  h4, h5, h6 {
+    @apply font-eb-garamond uppercase tracking-heading font-medium;
+  }
+
+  button, a.btn {
+    @apply uppercase tracking-wedding font-medium transition-colors duration-300 transform;
   }
 }

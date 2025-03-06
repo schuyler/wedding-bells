@@ -160,7 +160,7 @@ describe('AudioRecorder', () => {
         onCancel={mockOnCancel} 
       />
     )
-    expect(screen.getByText('Ready to Record')).toBeInTheDocument()
+    expect(screen.getByText('READY TO RECORD')).toBeInTheDocument()
     expect(screen.getByText('Click start when you are ready')).toBeInTheDocument()
   })
 
