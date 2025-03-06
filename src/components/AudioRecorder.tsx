@@ -66,12 +66,36 @@ export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderPr
     }
   }, [volumeError])
 
-  // Cleanup resources on unmount
+  // Initialize audio analysis on component mount
   useEffect(() => {
+    const initializeVolumeAnalysis = async () => {
+      try {
+        // Get media stream for volume analysis
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            sampleRate: 48000,
+          }
+        })
+        
+        // Store stream reference for cleanup
+        mediaStreamRef.current = stream
+        
+        // Initialize volume analysis with the stream
+        initializeAnalysis(stream)
+      } catch (err) {
+        console.log('Error initializing volume analysis:', err)
+      }
+    }
+    
+    initializeVolumeAnalysis()
+    
+    // Cleanup resources on unmount
     return () => {
       stopAnalysis()
     }
-  }, [stopAnalysis])
+  }, [stopAnalysis, initializeAnalysis])
 
   /**
    * Handles state changes during recording
@@ -88,11 +112,8 @@ export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderPr
     setIsRecording(isRecording)
     setIsPaused(isPaused)
     setRecordingDuration(duration)
-
-    // Stop volume analysis when recording stops or pauses
-    if (!isRecording || isPaused) {
-      stopAnalysis()
-    }
+    
+    // Keep volume indicator active at all times - no need to stop analysis
   }, [stopAnalysis])
 
   /**
@@ -112,8 +133,10 @@ export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderPr
       setIsPermissionDenied(true)
       // Clear any existing error to ensure permission denied UI is shown
       setError(null)
+      // Stop audio analysis if permission is denied
+      stopAnalysis()
     }
-  }, [])
+  }, [stopAnalysis])
 
   /**
    * Handles errors from the AudioRecorderControl
@@ -152,22 +175,8 @@ export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderPr
    */
   const startRecording = useCallback(async () => {
     try {
-      // Get media stream for volume analysis
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          sampleRate: 48000,
-        }
-      })
-      
-      // Store stream reference for cleanup
-      mediaStreamRef.current = stream
-      
-      // Initialize volume analysis with the stream
-      initializeAnalysis(stream)
-      
-      // Start recording
+      // Start recording with AudioRecorderControl
+      // We don't need to initialize the volume analysis again since it's done on component mount
       await audioRecorderControlRef.current?.startRecording()
     } catch (err) {
       console.log('Error caught in startRecording:', err, 'Error name:', err instanceof Error ? err.name : 'Not an Error object');
@@ -188,7 +197,7 @@ export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderPr
         handleError(new Error('Failed to access microphone. Please check your settings and try again.'))
       }
     }
-  }, [initializeAnalysis, handleError, handlePermissionChange])
+  }, [handleError, handlePermissionChange])
 
   /**
    * Handles countdown timer completion
@@ -322,15 +331,11 @@ export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderPr
                 <button
                   onClick={() => {
                     if (isPaused) {
-                      // Resume recording and volume analysis
+                      // Resume recording (volume analysis continues to run)
                       audioRecorderControlRef.current?.resumeRecording()
-                      if (mediaStreamRef.current) {
-                        initializeAnalysis(mediaStreamRef.current)
-                      }
                     } else {
-                      // Pause recording and volume analysis
+                      // Pause recording (volume analysis continues to run)
                       audioRecorderControlRef.current?.pauseRecording()
-                      stopAnalysis()
                     }
                   }}
                   className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors"
