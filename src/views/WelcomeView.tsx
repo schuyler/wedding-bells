@@ -20,10 +20,13 @@ import { useRecording } from '../context/RecordingContext';
  * 3. Uses context to manage state and navigation
  */
 export function WelcomeView(): React.ReactElement {
-  const { setGuestInfo, goToNextStep } = useRecording();
+  const { setGuestInfo, goToNextStep, guestInfo } = useRecording();
   const handleSubmit = (info: { name: string }) => {
     setGuestInfo({ name: info.name, email: '' });
     goToNextStep();
   };
-  return <WelcomeForm onSubmit={handleSubmit} />;
+  return <WelcomeForm 
+    onSubmit={handleSubmit} 
+    defaultValues={guestInfo || undefined} 
+  />;
 }

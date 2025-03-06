@@ -10,9 +10,11 @@ import { LoadingSpinner } from './LoadingSpinner'
  * Props interface for the WelcomeForm component.
  * 
  * @property onSubmit - Callback function invoked with guest information when form is successfully submitted
+ * @property defaultValues - Optional default values for the form fields
  */
 interface WelcomeFormProps {
-  onSubmit: (data: GuestInfo) => void
+  onSubmit: (data: GuestInfo) => void;
+  defaultValues?: Partial<GuestInfo>;
 }
 
 /**
@@ -62,7 +64,7 @@ interface WelcomeFormProps {
  *    - Ensure keyboard navigation works correctly
  *    - Add better focus management during errors and loading states
  */
-export function WelcomeForm({ onSubmit }: WelcomeFormProps) {
+export function WelcomeForm({ onSubmit, defaultValues }: WelcomeFormProps) {
   const [isChecking, setIsChecking] = useState(false)
   const [error, setError] = useState<{
     title: string
@@ -83,7 +85,8 @@ export function WelcomeForm({ onSubmit }: WelcomeFormProps) {
     handleSubmit,
     formState: { errors, isSubmitting }
   } = useForm<GuestInfoSchema>({
-    resolver: zodResolver(guestInfoSchema)
+    resolver: zodResolver(guestInfoSchema),
+    defaultValues: defaultValues
   })
 
   const requestMicrophoneAccess = async () => {
@@ -160,6 +163,7 @@ export function WelcomeForm({ onSubmit }: WelcomeFormProps) {
             type="text"
             id="name"
             {...register('name')}
+            autoComplete="off"
             disabled={isChecking || isSubmitting}
             className={`w-full px-4 py-2 rounded-lg border ${
               errors.name ? 'border-red-500' : 'border-gray-300'
@@ -183,10 +187,10 @@ export function WelcomeForm({ onSubmit }: WelcomeFormProps) {
           {isChecking || isSubmitting ? (
             <>
               <LoadingSpinner size="sm" light />
-              <span>{isChecking ? 'Checking Microphone...' : 'Starting Recording...'}</span>
+              <span>{isChecking ? 'Checking Microphone...' : 'Continuing...'}</span>
             </>
           ) : (
-            'Start Recording'
+            'Continue'
           )}
         </button>
       </form>
