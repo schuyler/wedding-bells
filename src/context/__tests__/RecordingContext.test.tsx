@@ -198,7 +198,7 @@ describe('RecordingContext Navigation', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/thankyou');
   });
 
-  it('resets flow state correctly', () => {
+  it('resets flow state correctly but preserves guest info', () => {
     const { result } = renderHook(() => useRecording(), {
       wrapper: ({ children }) => (
         <BrowserRouter>
@@ -208,8 +208,9 @@ describe('RecordingContext Navigation', () => {
     });
 
     // Set up some state
+    const testGuestInfo = { name: 'Test', email: 'test@example.com' };
     act(() => {
-      result.current.setGuestInfo({ name: 'Test', email: 'test@example.com' });
+      result.current.setGuestInfo(testGuestInfo);
       result.current.setIsRecording(true);
       result.current.goToNextStep();
     });
@@ -219,9 +220,9 @@ describe('RecordingContext Navigation', () => {
       result.current.resetFlow();
     });
 
-    // Verify all state is reset
+    // Verify state is reset except guest info
     expect(result.current.currentStep).toBe('welcome');
-    expect(result.current.guestInfo).toBeNull();
+    expect(result.current.guestInfo).toEqual(testGuestInfo); // Guest info should be preserved
     expect(result.current.audioBlob).toBeNull();
     expect(result.current.isRecording).toBe(false);
     expect(result.current.isPaused).toBe(false);

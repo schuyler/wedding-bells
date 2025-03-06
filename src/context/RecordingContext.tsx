@@ -118,7 +118,7 @@ export const RecordingProvider = ({ children }: { children: ReactNode }) => {
 
   const resetFlow = useCallback(() => {
     setCurrentStep('welcome');
-    setGuestInfo(null); // Reset guest info as test expects this
+    // Preserve guest info when returning to welcome screen
     setAudioBlob(null);
     setIsRecording(false);
     setIsPaused(false);
