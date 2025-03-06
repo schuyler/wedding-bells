@@ -54,7 +54,7 @@ describe('WelcomeForm', () => {
     render(<WelcomeForm onSubmit={mockOnSubmit} />)
     
     // Verify heading
-    expect(screen.getByRole('heading', { name: /leave a message for marc & sea/i }))
+    expect(screen.getByRole('heading', { name: /record a message for the wedding podcast/i }))
       .toBeInTheDocument()
     
     // Verify name input field

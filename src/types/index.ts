@@ -58,6 +58,16 @@ export interface UploadState {
   error?: Error
 }
 
+export interface UploadConfig {
+  apiUrl: string;
+  uploadToken: string;
+}
+
+export const DEFAULT_UPLOAD_CONFIG: UploadConfig = {
+  apiUrl: '/upload',
+  uploadToken: 'your-upload-token' // This should come from environment variables
+}
+
 export interface BrowserCompatibility {
   hasAudioSupport: boolean
   hasMicrophonePermission: boolean

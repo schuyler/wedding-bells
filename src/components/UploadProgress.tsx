@@ -164,7 +164,7 @@ export function UploadProgress({
       {error && (
         <ErrorModal
           isOpen={!!error}
-          onClose={() => {}}
+          onClose={onRetry || (() => {})}
           title="Upload Failed"
           description={error}
           action={
