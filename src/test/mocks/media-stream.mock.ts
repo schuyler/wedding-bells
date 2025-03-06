@@ -1,4 +1,4 @@
-export class MediaStreamMock implements MediaStream {
+export class MediaStreamMock {
   private tracks: MediaStreamTrack[] = [];
 
   constructor(tracks: MediaStreamTrack[] = []) {

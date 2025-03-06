@@ -1,6 +1,6 @@
 import { render, act } from '@testing-library/react'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
-import React, { useRef } from 'react'
+import React from 'react'
 import { AudioRecorderControl, AudioRecorderControls } from '../AudioRecorderControl'
 import { MediaStreamMock } from '../../test/mocks/media-stream.mock'
 

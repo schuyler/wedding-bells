@@ -60,7 +60,7 @@ describe('WelcomeView', () => {
     fireEvent.click(screen.getByText('Submit'));
     
     // Verify that setGuestInfo was called with the expected data
-    expect(mockSetGuestInfo).toHaveBeenCalledWith({ name: 'Test User', email: '' });
+    expect(mockSetGuestInfo).toHaveBeenCalledWith({ name: 'Test User' });
     
     // Verify that goToNextStep was called
     expect(mockGoToNextStep).toHaveBeenCalled();
@@ -77,7 +77,7 @@ describe('WelcomeView', () => {
     fireEvent.click(screen.getByText('Submit'));
     
     // Verify that setGuestInfo was called with the custom name
-    expect(mockSetGuestInfo).toHaveBeenCalledWith({ name: 'Custom Name', email: '' });
+    expect(mockSetGuestInfo).toHaveBeenCalledWith({ name: 'Custom Name' });
     
     // Verify that goToNextStep was called
     expect(mockGoToNextStep).toHaveBeenCalled();

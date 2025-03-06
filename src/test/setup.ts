@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import { cleanup } from '@testing-library/react';
-import { afterEach, beforeEach } from 'vitest';
+import { afterEach } from 'vitest';
 import { mockAnimationsApi } from 'jsdom-testing-mocks';
 
 /**
@@ -49,7 +49,7 @@ class MockMediaRecorder {
    * @param stream - MediaStream to record from (unused in mock implementation)
    * @param options - Optional configuration parameters (unused in mock implementation)
    */
-  constructor(stream: MediaStream, options?: MediaRecorderOptions) {
+  constructor(_stream: MediaStream, _options?: MediaRecorderOptions) {
     // In a real implementation, this would configure the recorder
     // For testing purposes, we don't need to use these parameters
   }
@@ -59,7 +59,7 @@ class MockMediaRecorder {
    * 
    * @param timeslice - Optional timeslice parameter for ondataavailable events (unused in mock)
    */
-  start(timeslice?: number) {
+  start(_timeslice?: number) {
     // Update state to recording
     this.state = 'recording';
     

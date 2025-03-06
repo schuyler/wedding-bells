@@ -35,7 +35,7 @@ export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderPr
   // Recording state management
   const [isRecording, setIsRecording] = useState(false)
   const [isPaused, setIsPaused] = useState(false)
-  const [recordingDuration, setRecordingDuration] = useState(0)
+  // Duration is tracked by CountdownTimer component
   
   // Error handling state
   const [error, setError] = useState<Error | null>(null)
@@ -102,8 +102,7 @@ export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderPr
    */
   const handleStateChange = useCallback(({ 
     isRecording, 
-    isPaused, 
-    duration 
+    isPaused 
   }: { 
     isRecording: boolean; 
     isPaused: boolean; 
@@ -111,7 +110,6 @@ export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderPr
   }) => {
     setIsRecording(isRecording)
     setIsPaused(isPaused)
-    setRecordingDuration(duration)
     
     // Keep volume indicator active at all times - no need to stop analysis
   }, [stopAnalysis])

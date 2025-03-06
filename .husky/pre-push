@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Get the name of the branch being pushed to
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+# Only run build check when pushing to main
+if [ "$BRANCH" = "main" ]; then
+  echo "🔍 Pushing to main branch. Running build check..."
+  
+  # Run the TypeScript check only (faster than full build)
+  npm run check-build
+  
+  # If build fails, prevent the push
+  if [ $? -ne 0 ]; then
+    echo "❌ Build failed! Push aborted."
+    echo "Fix the errors before pushing to main."
+    exit 1
+  fi
+  
+  echo "✅ Build successful! Continuing with push..."
+fi

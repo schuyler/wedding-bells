@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, fireEvent, act, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 
 // Mock import.meta.env
 vi.stubGlobal('import', { meta: { env: { DEV: false } } })
-import React, { forwardRef, useImperativeHandle, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // Standard debug values object for reuse in tests (but not in vi.mock)
 const testDebugValues = {
@@ -337,7 +337,7 @@ describe('AudioRecorder', () => {
     })
     
     // Force a rerender to show the error
-    const { rerender } = render(
+    render(
       <AudioRecorder 
         onRecordingComplete={mockOnRecordingComplete} 
         onCancel={mockOnCancel} 

@@ -4,9 +4,8 @@ import { ErrorModal } from '../ErrorModal'
 
 describe('ErrorModal', () => {
   it('renders with required props', async () => {
-    let renderResult;
     await act(async () => {
-      renderResult = render(
+      render(
         <ErrorModal
           isOpen={true}
           onClose={() => {}}

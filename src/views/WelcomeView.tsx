@@ -22,7 +22,7 @@ import { useRecording } from '../context/RecordingContext';
 export function WelcomeView(): React.ReactElement {
   const { setGuestInfo, goToNextStep, guestInfo } = useRecording();
   const handleSubmit = (info: { name: string }) => {
-    setGuestInfo({ name: info.name, email: '' });
+    setGuestInfo({ name: info.name });
     goToNextStep();
   };
   return <WelcomeForm 

@@ -72,7 +72,7 @@ export function useUpload(options: UploadOptions = {}) {
   /**
    * Simulates upload progress with updates over time
    */
-  const simulateUpload = useCallback((controller: AbortController, resolve: () => void, reject: (error: Error) => void) => {
+  const simulateUpload = useCallback((controller: AbortController, resolve: (value?: any) => void, reject: (error: Error) => void) => {
     const startTime = Date.now();
     const totalDuration = simulationSettings.duration;
     
