@@ -350,7 +350,7 @@ export const AudioRecorderControl = forwardRef<AudioRecorderControls, AudioRecor
 
     return (
       <>
-        {isRecording && (
+        {false && isRecording && (
           <div className="bg-gray-100 p-2 rounded-md text-xs font-mono mt-2 mb-2">
             <div>Recording Debug Info:</div>
             <div>Chunks collected: {chunkCount}</div>

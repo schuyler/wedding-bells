@@ -264,36 +264,39 @@ export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderPr
           </p>
         </div>
 
-        <div className="flex flex-col items-center space-y-4">
-        {/* Volume Analysis Debug Display */}
-        <div className="space-y-4">
-          {/* Volume Level Indicator */}
-          <VolumeIndicator 
-            volume={isPaused ? 0 : currentVolume}
-            size="lg"
-            className="w-full max-w-md"
-          />
+        <div className="flex flex-col items-center space-y-4 md:space-y-2">
+          {/* Volume and Timer Container - Column on mobile, row on md+ screens */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-center space-y-4 md:space-y-0">
+            {/* Volume Analysis Container */}
+            <div className="w-full md:w-auto">
+              {/* Volume Level Indicator */}
+              <VolumeIndicator 
+                volume={isPaused ? 0 : currentVolume}
+                size="lg"
+                className="w-full max-w-xs mx-auto"
+              />
 
-          {/* Debug Values Display (hidden by default) */}
-          {import.meta.env.DEV && (
-            <div className="bg-gray-100 p-2 rounded-md text-xs font-mono w-full max-w-md">
-              <div>Volume Analysis Debug:</div>
-              <div>Raw RMS: {debugValues.rawRms.toFixed(6)}</div>
-              <div>dB Value: {debugValues.dbValue.toFixed(2)} dB</div>
-              <div>Normalized Volume: {debugValues.normalizedVolume.toFixed(4)}</div>
-              <div>Range: {debugValues.minDb}dB to {debugValues.maxDb}dB</div>
+              {/* Debug Values Display (disabled but preserved) */}
+              {false && import.meta.env.DEV && (
+                <div className="bg-gray-100 p-2 rounded-md text-xs font-mono w-full max-w-xs mx-auto">
+                  <div>Volume Analysis Debug:</div>
+                  <div>Raw RMS: {debugValues.rawRms.toFixed(6)}</div>
+                  <div>dB Value: {debugValues.dbValue.toFixed(2)} dB</div>
+                  <div>Normalized Volume: {debugValues.normalizedVolume.toFixed(4)}</div>
+                  <div>Range: {debugValues.minDb}dB to {debugValues.maxDb}dB</div>
+                </div>
+              )}
             </div>
-          )}
-        </div>
 
-          {/* Recording Timer */}
-          {isRecording && (
-            <CountdownTimer
-              duration={MAX_DURATION}
-              running={!isPaused}
-              onComplete={handleTimerComplete}
-            />
-          )}
+            {/* Recording Timer - Always visible but only running when recording */}
+            <div className="mx-auto md:mx-0 md:ml-4">
+              <CountdownTimer
+                duration={MAX_DURATION}
+                running={isRecording && !isPaused}
+                onComplete={handleTimerComplete}
+              />
+            </div>
+          </div>
 
           {/* Control buttons */}
           <div className="flex items-center justify-center space-x-4">

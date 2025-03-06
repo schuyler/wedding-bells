@@ -45,11 +45,10 @@ export function CountdownTimer({
   running = true,
   className = ''
 }: CountdownTimerProps) {
+  // Track remaining time and elapsed time separately
   const [timeLeft, setTimeLeft] = useState(duration)
-  // Note: startTime is set once at component initialization and never updated,
-  // which means pause/resume won't work correctly for accurate time tracking
-  const [startTime] = useState(Date.now())
-
+  const [elapsedSeconds, setElapsedSeconds] = useState(0)
+  
   /**
    * Formats seconds into MM:SS display format.
    * 
@@ -63,39 +62,51 @@ export function CountdownTimer({
   }, [])
 
   // Calculate progress percentage (0 to 100)
-  const progress = ((duration - timeLeft) / duration) * 100
+  const progress = (elapsedSeconds / duration) * 100
 
   // Calculate the stroke dash for the progress ring
   const radius = 36
   const circumference = 2 * Math.PI * radius
   const strokeDasharray = `${circumference}`
-  const strokeDashoffset = duration === 0 ? 0 : circumference - (progress / 100) * circumference
+  const strokeDashoffset = circumference - (progress / 100) * circumference
+  
+  // Reset timer if duration changes
+  useEffect(() => {
+    setTimeLeft(duration)
+    setElapsedSeconds(0)
+  }, [duration])
 
   /**
    * Timer effect to update the countdown display.
    * 
-   * When running is true, updates timeLeft every second based on elapsed time.
+   * Only counts down when running is true.
+   * Updates one second at a time using setInterval.
    * Triggers onComplete callback when countdown reaches zero.
    */
   useEffect(() => {
+    // Don't run the timer when paused
     if (!running) return
-
+    
     const timer = setInterval(() => {
-      // Calculate elapsed time based on wall clock
-      const elapsed = Math.floor((Date.now() - startTime) / 1000)
-      const remaining = duration - elapsed
-
-      if (remaining <= 0) {
-        clearInterval(timer)
-        setTimeLeft(0)
-        onComplete?.()
-      } else {
-        setTimeLeft(remaining)
-      }
+      setElapsedSeconds(prev => {
+        const newElapsed = prev + 1
+        
+        // Calculate new time left
+        const newTimeLeft = duration - newElapsed
+        setTimeLeft(Math.max(0, newTimeLeft))
+        
+        // Check if timer completed
+        if (newTimeLeft <= 0) {
+          clearInterval(timer)
+          onComplete?.()
+        }
+        
+        return newElapsed
+      })
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [duration, startTime, running, onComplete])
+  }, [running, duration, onComplete])
 
   /**
    * Determines color class based on remaining time percentage.
