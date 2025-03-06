@@ -147,10 +147,10 @@ export function WelcomeForm({ onSubmit, defaultValues }: WelcomeFormProps) {
 
       <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">
-          Leave a Message for Marc & Sea
+          Record a message for the wedding podcast
         </h2>
         <p className="text-gray-600">
-          Record a personal message for the happy couple that they can cherish forever.
+          Share your favorite memory, well wishes, or advice for the newlyweds!
         </p>
       </div>
 
