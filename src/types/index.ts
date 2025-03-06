@@ -64,8 +64,8 @@ export interface UploadConfig {
 }
 
 export const DEFAULT_UPLOAD_CONFIG: UploadConfig = {
-  apiUrl: '/upload',
-  uploadToken: 'your-upload-token' // This should come from environment variables
+  apiUrl: '/upload', // This will be overridden by env vars when available
+  uploadToken: 'dev-token' // This will be overridden by env vars when available
 }
 
 export interface BrowserCompatibility {

@@ -67,18 +67,27 @@ export const RecordingProvider = ({ children }: { children: ReactNode }) => {
     
     try {
       // Create a file object with the correct name
-      const fileName = `${guestInfo.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}.wav`;
+      const fileExtension = audioBlob.type === 'audio/webm' ? 'webm' : 'wav';
+      const fileName = `${guestInfo.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}.${fileExtension}`;
+      
+      // Get approximate recording duration (if we've tracked it elsewhere)
+      // This would be more accurate if we tracked it during recording
+      let duration = 0;
+      if ('duration' in audioBlob) {
+        duration = (audioBlob as any).duration || 0;
+      }
       
       // Create metadata for the upload
       const metadata = {
         guestName: guestInfo.name,
         timestamp: new Date().toISOString(),
-        duration: 0, // This would be populated with actual recording duration
+        duration: duration,
         originalFilename: fileName
       };
       
       // Start the upload
-      await initiateUpload(audioBlob, metadata);
+      const result = await initiateUpload(audioBlob, metadata);
+      console.log('Upload successful:', result);
       
       // On success, go to next step (this only executes if upload doesn't reject)
       goToNextStep();
@@ -95,18 +104,26 @@ export const RecordingProvider = ({ children }: { children: ReactNode }) => {
     
     try {
       // Create a file object with the correct name
-      const fileName = `${guestInfo.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}.wav`;
+      const fileExtension = audioBlob.type === 'audio/webm' ? 'webm' : 'wav';
+      const fileName = `${guestInfo.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}.${fileExtension}`;
+      
+      // Get approximate recording duration (if we've tracked it elsewhere)
+      let duration = 0;
+      if ('duration' in audioBlob) {
+        duration = (audioBlob as any).duration || 0;
+      }
       
       // Create metadata for the upload
       const metadata = {
         guestName: guestInfo.name,
         timestamp: new Date().toISOString(),
-        duration: 0,
+        duration: duration,
         originalFilename: fileName
       };
       
       // Retry the upload
-      await initiateRetryUpload(audioBlob, metadata);
+      const result = await initiateRetryUpload(audioBlob, metadata);
+      console.log('Upload retry successful:', result);
       
       // On success, go to next step
       goToNextStep();
