@@ -73,6 +73,21 @@ async function handleUpload(request: Request, env: Env): Promise<Response> {
     if (!audioFile.type.startsWith('audio/')) {
       return new Response('Invalid file type', { status: 400 });
     }
+    
+    // Limit file size to 25MB (sufficient for 15-minute WAV recording)
+    const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
+    if (audioFile.size > MAX_FILE_SIZE) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'File too large, maximum size is 25MB'
+      }), { 
+        status: 400,
+        headers: {
+          ...getCorsHeaders(env, request),
+          'Content-Type': 'application/json',
+        },
+      });
+    }
 
     // Generate unique filename with timestamp, guest name, and extension from content type
     const fileExt = audioFile.type === 'audio/webm' ? 'webm' : 
@@ -138,7 +153,7 @@ export default {
         if (url.pathname === '/status') {
           return new Response(JSON.stringify({ status: 'ok' }), {
             headers: {
-              ...getCorsHeaders(env),
+              ...getCorsHeaders(env, request),
               'Content-Type': 'application/json',
             },
           });
