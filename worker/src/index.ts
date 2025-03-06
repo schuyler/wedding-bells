@@ -15,9 +15,22 @@ interface MessageMetadata {
 /**
  * Generate CORS headers based on the configured allowed origin
  */
-function getCorsHeaders(env: Env) {
+function getCorsHeaders(env: Env, request: Request) {
+  // Allow requests from both the CNAME domain and the pages.dev domain
+  const origin = request.headers.get('Origin');
+  const allowedOrigins = [
+    env.ALLOWED_ORIGIN,
+    'https://wedding-bells.pages.dev',
+    'https://marc-with-a-sea.axolotl.club'
+  ];
+  
+  // Use the requesting origin if it's in our allowed list, otherwise use the configured default
+  const allowOrigin = origin && allowedOrigins.includes(origin) 
+    ? origin 
+    : env.ALLOWED_ORIGIN;
+    
   return {
-    'Access-Control-Allow-Origin': env.ALLOWED_ORIGIN || '*',
+    'Access-Control-Allow-Origin': allowOrigin,
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, X-Upload-Token',
   };
@@ -26,7 +39,7 @@ function getCorsHeaders(env: Env) {
 async function handleOptions(request: Request, env: Env) {
   if (request.headers.get('Origin') !== null) {
     return new Response(null, {
-      headers: getCorsHeaders(env),
+      headers: getCorsHeaders(env, request),
     });
   }
   return new Response(null, {
@@ -84,7 +97,7 @@ async function handleUpload(request: Request, env: Env): Promise<Response> {
       url: `${env.PUBLIC_URL || ''}/${filename}`
     }), {
       headers: {
-        ...getCorsHeaders(env),
+        ...getCorsHeaders(env, request),
         'Content-Type': 'application/json',
       },
     });
@@ -96,7 +109,7 @@ async function handleUpload(request: Request, env: Env): Promise<Response> {
     }), { 
       status: 500,
       headers: {
-        ...getCorsHeaders(env),
+        ...getCorsHeaders(env, request),
         'Content-Type': 'application/json',
       },
     });
@@ -134,14 +147,14 @@ export default {
 
       return new Response('Not Found', { 
         status: 404,
-        headers: getCorsHeaders(env)
+        headers: getCorsHeaders(env, request)
       });
     } catch (error) {
       console.error('Unhandled error in worker:', error);
       return new Response(JSON.stringify({ error: 'Internal server error' }), { 
         status: 500,
         headers: {
-          ...getCorsHeaders(env),
+          ...getCorsHeaders(env, request),
           'Content-Type': 'application/json',
         },
       });

@@ -24,3 +24,7 @@ dist-ssr
 *.sw?
 
 /coverage
+
+# Environment variables
+.env
+.env.production
