@@ -61,7 +61,7 @@ describe('WelcomeForm', () => {
     expect(screen.getByLabelText(/your name/i)).toBeInTheDocument()
     
     // Verify submit button
-    expect(screen.getByRole('button', { name: /start recording/i }))
+    expect(screen.getByRole('button', { name: /continue/i }))
       .toBeInTheDocument()
   })
 
@@ -70,7 +70,7 @@ describe('WelcomeForm', () => {
     render(<WelcomeForm onSubmit={mockOnSubmit} />)
     
     // Submit the form without entering a name
-    await user.click(screen.getByRole('button', { name: /start recording/i }))
+    await user.click(screen.getByRole('button', { name: /continue/i }))
     
     // Wait for and verify error message
     await waitFor(() => {
@@ -90,7 +90,7 @@ describe('WelcomeForm', () => {
     await user.type(screen.getByLabelText(/your name/i), 'John Doe')
     
     // Submit the form
-    await user.click(screen.getByRole('button', { name: /start recording/i }))
+    await user.click(screen.getByRole('button', { name: /continue/i }))
     
     // Wait for error modal
     await waitFor(() => {
@@ -111,7 +111,7 @@ describe('WelcomeForm', () => {
     await user.type(screen.getByLabelText(/your name/i), 'John Doe')
     
     // Submit the form
-    await user.click(screen.getByRole('button', { name: /start recording/i }))
+    await user.click(screen.getByRole('button', { name: /continue/i }))
     
     // Wait for microphone check to complete and form to submit
     await waitFor(() => {
@@ -134,7 +134,7 @@ describe('WelcomeForm', () => {
     
     // Enter name and submit
     await user.type(screen.getByLabelText(/your name/i), 'John Doe')
-    await user.click(screen.getByRole('button', { name: /start recording/i }))
+    await user.click(screen.getByRole('button', { name: /continue/i }))
     
     // Wait for error modal
     await waitFor(() => {
@@ -160,7 +160,7 @@ describe('WelcomeForm', () => {
     
     // Enter name and submit
     await user.type(screen.getByLabelText(/your name/i), 'John Doe')
-    await user.click(screen.getByRole('button', { name: /start recording/i }))
+    await user.click(screen.getByRole('button', { name: /continue/i }))
     
     // Wait for error modal
     await waitFor(() => {
@@ -188,7 +188,7 @@ describe('WelcomeForm', () => {
     
     // Enter name and submit
     await user.type(screen.getByLabelText(/your name/i), 'John Doe')
-    await user.click(screen.getByRole('button', { name: /start recording/i }))
+    await user.click(screen.getByRole('button', { name: /continue/i }))
     
     // Verify loading state
     expect(screen.getByText(/checking microphone.../i)).toBeInTheDocument()

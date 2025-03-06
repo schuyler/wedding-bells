@@ -286,16 +286,24 @@ describe('AudioRecorder', () => {
       debugValues: testDebugValues
     })
     
-    // Click try again button
-    fireEvent.click(screen.getByTestId('error-action-button'))
+    // Click try again button and wait for state updates
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('error-action-button'))
+      // Wait for state updates to complete
+      await new Promise(resolve => setTimeout(resolve, 0))
+    })
     
     // Force a rerender with the new mock
-    rerender(
-      <AudioRecorder 
-        onRecordingComplete={mockOnRecordingComplete} 
-        onCancel={mockOnCancel} 
-      />
-    )
+    await act(async () => {
+      rerender(
+        <AudioRecorder 
+          onRecordingComplete={mockOnRecordingComplete} 
+          onCancel={mockOnCancel} 
+        />
+      )
+      // Wait for state updates to complete
+      await new Promise(resolve => setTimeout(resolve, 0))
+    })
     
     // Error modal should be closed
     expect(screen.queryByTestId('error-modal')).not.toBeInTheDocument()
@@ -354,6 +362,8 @@ describe('AudioRecorder', () => {
     // Click try again button - should call handleRecordingResume
     await act(async () => {
       fireEvent.click(screen.getByTestId('error-action-button'))
+      // Wait for state updates to complete
+      await new Promise(resolve => setTimeout(resolve, 0))
     })
     
     // Should have called initializeAnalysis for resume

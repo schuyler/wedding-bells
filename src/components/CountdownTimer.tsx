@@ -62,7 +62,7 @@ export function CountdownTimer({
   }, [])
 
   // Calculate progress percentage (0 to 100)
-  const progress = (elapsedSeconds / duration) * 100
+  const progress = duration > 0 ? (elapsedSeconds / duration) * 100 : 0
 
   // Calculate the stroke dash for the progress ring
   const radius = 36
