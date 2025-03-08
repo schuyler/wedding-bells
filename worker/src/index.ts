@@ -89,12 +89,18 @@ async function handleUpload(request: Request, env: Env): Promise<Response> {
       });
     }
 
-    // Generate unique filename with timestamp, guest name, and extension from content type
+    // Generate unique filename with ISO 8601 timestamp, guest name, and extension from content type
     const fileExt = audioFile.type === 'audio/webm' ? 'webm' : 
                     audioFile.type === 'audio/wav' ? 'wav' : 
                     audioFile.type === 'audio/mp4' ? 'm4a' : 'audio';
     
-    const filename = `${Date.now()}-${metadata.guestName.toLowerCase().replace(/[^a-z0-9]/g, '-')}.${fileExt}`;
+    // Format current date in a simplified format YYYYMMDD-HHMMSS
+    const date = new Date();
+    const formattedDate = date.toISOString()
+      .replace(/\.\d+Z$/, '')           // Remove milliseconds and Z suffix
+      .replace(/[:-]/g, '')             // Remove all colons and hyphens
+      .replace('T', '-');               // Replace 'T' separator with hyphen
+    const filename = `${formattedDate}-${metadata.guestName.toLowerCase().replace(/[^a-z0-9]/g, '-')}.${fileExt}`;
 
     // Upload to R2
     await env.AUDIO_BUCKET.put(filename, audioFile, {
