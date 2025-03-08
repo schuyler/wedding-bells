@@ -87,14 +87,17 @@ export const AudioRecorderControl = forwardRef<AudioRecorderControls, AudioRecor
       if (!isRecording) return null
 
       try {
+        // Get the MIME type from the media recorder (or use webm as default)
+        const mimeType = mediaRecorderRef.current?.mimeType || 'audio/webm';
+        
         // Stop MediaRecorder
         mediaRecorderRef.current?.stop()
         
         // Stop duration tracking
         stopDurationTimer()
 
-        // Create blob from recorded chunks
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
+        // Create blob from recorded chunks using the same MIME type as the recorder
+        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType })
         
         return audioBlob
       } catch (error) {
@@ -195,10 +198,27 @@ export const AudioRecorderControl = forwardRef<AudioRecorderControls, AudioRecor
         setChunkCount(0);
         setTotalDataSize(0);
 
-        // Setup MediaRecorder
-        const mediaRecorder = new MediaRecorder(stream, {
-          mimeType: 'audio/webm'
-        })
+        // Setup MediaRecorder with appropriate MIME type based on browser support
+        let mimeType = 'audio/webm';
+        
+        // Check if MediaRecorder has isTypeSupported method (for testing environments)
+        if (typeof MediaRecorder.isTypeSupported === 'function') {
+          // Check if the browser supports audio/webm
+          if (!MediaRecorder.isTypeSupported('audio/webm')) {
+            // Try audio/mp4 for Safari
+            if (MediaRecorder.isTypeSupported('audio/mp4')) {
+              mimeType = 'audio/mp4';
+            } else {
+              // Use default MIME type as last resort
+              mimeType = '';
+            }
+          }
+        }
+        
+        // Create MediaRecorder with detected MIME type
+        const mediaRecorder = mimeType 
+          ? new MediaRecorder(stream, { mimeType }) 
+          : new MediaRecorder(stream)
 
         mediaRecorderRef.current = mediaRecorder
         audioChunksRef.current = []
@@ -216,7 +236,7 @@ export const AudioRecorderControl = forwardRef<AudioRecorderControls, AudioRecor
         }
 
         mediaRecorder.onstop = () => {
-          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
+          const audioBlob = new Blob(audioChunksRef.current, { type: mediaRecorder.mimeType || 'audio/webm' })
           
           // Notify of recording data
           if (audioBlob.size > 0) {

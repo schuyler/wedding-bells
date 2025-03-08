@@ -111,6 +111,14 @@ graph TD
   - Test back navigation where applicable
   - Test cancel functionality
 
+### 2.6 Navigation Prevention
+- Test browser navigation warnings:
+  - Attempt to close browser tab during recording
+  - Attempt to navigate away during recording
+  - Attempt to close browser tab during upload
+  - Attempt to navigate away during upload
+  - Verify warning dialogs appear appropriately
+
 ## 3. Implemented Tests
 
 The following tests have been implemented:
@@ -215,9 +223,9 @@ Areas for future test improvement include:
    - Network failure simulation
    - Recovery procedure testing
 
-4. **State Persistence**
-   - Browser refresh handling
-   - Navigation state preservation testing
+4. **State Preservation**
+   - Navigation warnings for browsers
+   - Session recovery options
 
 # Implementation Plan
 

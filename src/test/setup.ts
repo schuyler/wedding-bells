@@ -25,6 +25,9 @@ class MockMediaRecorder {
   /** Current state of the recorder: 'inactive', 'recording', or 'paused' */
   state: 'inactive' | 'recording' | 'paused' = 'inactive';
   
+  /** MIME type of the recording */
+  mimeType: string = 'audio/webm';
+  
   /** Event handler for data availability */
   ondataavailable: ((event: any) => void) | null = null;
   
@@ -42,6 +45,13 @@ class MockMediaRecorder {
   
   /** Event handler for errors */
   onerror: ((event: Event) => void) | null = null;
+  
+  /** Static method to check if a MIME type is supported */
+  static isTypeSupported(mimeType: string): boolean {
+    // For tests, we'll say we support these MIME types
+    const supportedTypes = ['audio/webm', 'audio/mp4', 'audio/ogg'];
+    return supportedTypes.includes(mimeType);
+  }
 
   /**
    * Creates a new MockMediaRecorder instance
@@ -49,9 +59,11 @@ class MockMediaRecorder {
    * @param stream - MediaStream to record from (unused in mock implementation)
    * @param options - Optional configuration parameters (unused in mock implementation)
    */
-  constructor(_stream: MediaStream, _options?: MediaRecorderOptions) {
+  constructor(_stream: MediaStream, options?: MediaRecorderOptions) {
     // In a real implementation, this would configure the recorder
-    // For testing purposes, we don't need to use these parameters
+    if (options?.mimeType) {
+      this.mimeType = options.mimeType;
+    }
   }
 
   /**
@@ -78,7 +90,7 @@ class MockMediaRecorder {
     this.state = 'inactive';
     
     // Create a mock Blob for the recording data
-    const blob = new Blob(['mock audio data'], { type: 'audio/webm' });
+    const blob = new Blob(['mock audio data'], { type: this.mimeType });
     
     // Call ondataavailable with the blob
     if (this.ondataavailable) {

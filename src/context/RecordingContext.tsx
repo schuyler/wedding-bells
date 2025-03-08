@@ -66,8 +66,15 @@ export const RecordingProvider = ({ children }: { children: ReactNode }) => {
     }
     
     try {
-      // Create a file object with the correct name
-      const fileExtension = audioBlob.type === 'audio/webm' ? 'webm' : 'wav';
+      // Create a file object with the correct name based on the MIME type
+      let fileExtension = 'webm';
+      if (audioBlob.type.includes('mp4')) {
+        fileExtension = 'm4a'; // Safari uses MP4 container for audio
+      } else if (audioBlob.type.includes('wav')) {
+        fileExtension = 'wav';
+      } else if (audioBlob.type.includes('ogg')) {
+        fileExtension = 'ogg';
+      }
       const fileName = `${guestInfo.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}.${fileExtension}`;
       
       // Get approximate recording duration (if we've tracked it elsewhere)
@@ -103,8 +110,15 @@ export const RecordingProvider = ({ children }: { children: ReactNode }) => {
     }
     
     try {
-      // Create a file object with the correct name
-      const fileExtension = audioBlob.type === 'audio/webm' ? 'webm' : 'wav';
+      // Create a file object with the correct name based on the MIME type
+      let fileExtension = 'webm';
+      if (audioBlob.type.includes('mp4')) {
+        fileExtension = 'm4a'; // Safari uses MP4 container for audio
+      } else if (audioBlob.type.includes('wav')) {
+        fileExtension = 'wav';
+      } else if (audioBlob.type.includes('ogg')) {
+        fileExtension = 'ogg';
+      }
       const fileName = `${guestInfo.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}.${fileExtension}`;
       
       // Get approximate recording duration (if we've tracked it elsewhere)
