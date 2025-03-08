@@ -55,6 +55,30 @@ export function useUpload(options: UploadOptions = {}) {
     return cleanup;
   }, [cleanup]);
   
+  // Prevent navigation during active upload
+  useEffect(() => {
+    // Only add listener if actively uploading
+    if (uploadState.status === 'uploading' && uploadState.progress > 0 && uploadState.progress < 100) {
+      const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+        const message = 'Upload in progress. If you leave now, your recording will not be saved. Continue?';
+        
+        // Modern browsers require both of these for the confirmation dialog to appear
+        // Even though returnValue is deprecated, it's still required for cross-browser compatibility
+        e.preventDefault();
+        e.returnValue = message;
+        
+        // Returning a string triggers the confirmation dialog in older browsers
+        return message;
+      };
+
+      window.addEventListener('beforeunload', handleBeforeUnload);
+      
+      return () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+      };
+    }
+  }, [uploadState.status, uploadState.progress]);
+  
   /**
    * Creates a FormData object with the file and metadata
    */

@@ -326,6 +326,32 @@ export const AudioRecorderControl = forwardRef<AudioRecorderControls, AudioRecor
         cleanupRecording()
       }
     }, [cleanupRecording])
+    
+    // Prevent navigation while recording
+    useEffect(() => {
+      // Only add the event listener if recording is active
+      if (isRecording) {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+          // Standard way to show a confirmation dialog
+          const message = 'You have an active recording in progress. Are you sure you want to leave?';
+          
+          // Modern browsers require both of these for the confirmation dialog to appear
+          // Even though returnValue is deprecated, it's still required for cross-browser compatibility
+          e.preventDefault();
+          e.returnValue = message;
+          
+          // Returning a string triggers the confirmation dialog in older browsers
+          return message;
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        
+        // Clean up by removing the event listener
+        return () => {
+          window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+      }
+    }, [isRecording])
 
     // Expose controls via ref
     useImperativeHandle(
