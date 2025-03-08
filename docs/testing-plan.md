@@ -1,5 +1,54 @@
 # Marc With A Sea Wedding Website - Testing Plan
 
+## Testing Infrastructure
+
+The application uses:
+- **Vitest** - Test runner and framework
+- **Testing Library** - For React component testing
+- **Happy DOM** - For DOM environment
+- **Mock implementations** - For MediaStream and browser APIs
+
+## Test Organization
+
+```
+src/
+  __tests__/           # Global test utilities
+  components/
+    __tests__/        # Component-specific tests
+  context/
+    __tests__/        # Context tests
+  hooks/
+    __tests__/        # Hook tests
+  views/
+    __tests__/        # View tests
+  test/
+    mocks/            # Mock implementations
+    setup/            # Test setup files
+```
+
+## Running Tests
+
+Tests can be run using:
+
+```bash
+# Run all tests
+npm run test
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run specific tests
+npx vitest <test-file-pattern>
+```
+
+## Test Coverage Goals
+
+The current test coverage meets the following targets:
+- Statements: 80%
+- Branches: 75%
+- Functions: 80%
+- Lines: 80%
+
 # Phase 1: Frontend Testing
 
 ## 1. Local Development Setup
@@ -62,30 +111,53 @@ graph TD
   - Test back navigation where applicable
   - Test cancel functionality
 
+## 3. Implemented Tests
+
+The following tests have been implemented:
+
+### Component Tests
+- Basic UI components (WelcomeForm, AudioRecorder, etc.)
+- Visual components (ProgressBar, LoadingSpinner, etc.)
+- Interactive elements (CountdownTimer, VolumeIndicator, etc.)
+
+### Context Tests
+- RecordingContext navigation methods
+- State transitions in RecordingContext
+- Context provider functionality
+
+### Hook Tests
+- useAudioRecording hook
+- useUpload hook
+
+### View Tests
+- View component redirects
+- Navigation validation
+- Basic rendering and interactions
+
 # Phase 2: Backend Integration
 (To be implemented after frontend testing is complete)
 
-## 3. Backend Setup and Testing
+## 4. Backend Setup and Testing
 - Verify worker starts correctly
 - Test R2 bucket configuration:
   - Create test bucket if not exists
   - Verify read/write permissions
 
-### 3.2 API Endpoints
+### 4.1 API Endpoints
 - Test `/upload` endpoint:
   - Send valid requests with proper authentication
   - Send requests with invalid authentication
   - Send malformed requests
   - Test file size limits
 
-### 3.3 File Storage
+### 4.2 File Storage
 - Verify files are stored correctly in R2
 - Check metadata is properly attached to files
 - Verify filename format follows the pattern: `timestamp-guest-name.webm`
 
-## 4. Integration Testing
+## 5. Integration Testing
 
-### 4.1 End-to-End Flow
+### 5.1 End-to-End Flow
 - Complete the entire user journey:
   1. Enter guest information
   2. Record a message
@@ -93,7 +165,7 @@ graph TD
   4. Upload to backend
   5. Verify thank you screen
 
-### 4.2 Cross-Browser Testing
+### 5.2 Cross-Browser Testing
 - Test on multiple browsers:
   - Chrome
   - Firefox
@@ -103,31 +175,51 @@ graph TD
   - iOS Safari
   - Android Chrome
 
-## 5. Performance Testing
+## 6. Performance Testing
 
-### 5.1 Recording Performance
+### 6.1 Recording Performance
 - Test with long recordings (near 15-minute limit)
 - Monitor memory usage during extended recordings
 - Test with various audio input qualities
 
-### 5.2 Upload Performance
+### 6.2 Upload Performance
 - Test uploading large files
 - Measure upload speeds and optimize if needed
 - Test upload progress accuracy
 
-## 6. Security Testing
+## 7. Security Testing
 
-### 6.1 Authentication
+### 7.1 Authentication
 - Verify upload token validation works
 - Test with invalid tokens
 - Test with missing tokens
 
-### 6.2 Input Validation
+### 7.2 Input Validation
 - Test with malformed input data
 - Test with unexpected file types
 - Test with extremely large files
 
-## 7. Implementation Plan
+# Future Improvements
+
+Areas for future test improvement include:
+
+1. **MediaStream Testing**
+   - Enhanced mock implementation
+   - Simulated audio inputs
+
+2. **Permission Handling**
+   - Comprehensive permission test cases
+   - Browser-specific behavior testing
+
+3. **Error Scenarios**
+   - Network failure simulation
+   - Recovery procedure testing
+
+4. **State Persistence**
+   - Browser refresh handling
+   - Navigation state preservation testing
+
+# Implementation Plan
 
 To implement this testing plan:
 
