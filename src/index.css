@@ -1,9 +1,9 @@
+/* Import wedding fonts */
+@import url('https://fonts.googleapis.com/css2?family=Zen+Antique:wght@400&family=EB+Garamond:wght@300;400;500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import wedding fonts */
-@import url('https://fonts.googleapis.com/css2?family=Zen+Antique:wght@400&family=EB+Garamond:wght@300;400;500&display=swap');
 
 /* Base styles for the wedding website */
 @layer base {
