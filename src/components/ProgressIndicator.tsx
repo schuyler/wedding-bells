@@ -94,9 +94,13 @@ export function ProgressIndicator({
         STEP {states.indexOf(currentState) + 1} OF {states.length}
       </div>
 
-      {/* Step Label - Custom transformation for welcome state */}
+      {/* Step Label - Custom transformation for states */}
       <div className="text-sm sm:text-base font-medium text-wedding-light uppercase tracking-wedding">
-        {currentState === 'welcome' ? 'Get Started' : currentState}
+        {currentState === 'welcome' 
+          ? 'Get Started' 
+          : currentState === 'thankyou'
+            ? 'Thank You'
+            : currentState}
       </div>
     </div>
   )
