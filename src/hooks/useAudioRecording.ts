@@ -94,8 +94,9 @@ export function useAudioVolume(config: VolumeConfig = {}): UseAudioVolume {
   const lastVolumeRef = useRef(0)
   const lastUpdateRef = useRef(0)
 
-  // Falloff configuration
-  const FALLOFF_DURATION = 200 // 200ms decay - faster falloff for more responsive visualization
+  // Smoothing configuration
+  const FALLOFF_DURATION = 500 // 500ms decay - slower falloff for smoother visualization
+  const RISE_SPEED = 0.3 // Controls how quickly volume rises (0-1, lower = smoother)
   const FALLOFF_FACTOR = Math.exp(Math.log(0.001) / FALLOFF_DURATION) // Decay to 0.1% in FALLOFF_DURATION
 
   /**
@@ -193,9 +194,11 @@ export function useAudioVolume(config: VolumeConfig = {}): UseAudioVolume {
         const timeDelta = now - lastUpdateRef.current
         const decayMultiplier = Math.pow(FALLOFF_FACTOR, timeDelta)
         
-        // If new volume is higher, use it directly; if lower, apply decay
+        // Apply smoothing in both directions
+        // For rising volumes: interpolate with RISE_SPEED factor
+        // For falling volumes: apply exponential decay
         const smoothedVolume = normalizedVolume > lastVolumeRef.current
-          ? normalizedVolume
+          ? lastVolumeRef.current + (normalizedVolume - lastVolumeRef.current) * RISE_SPEED
           : lastVolumeRef.current * decayMultiplier
 
         // Update state and refs
