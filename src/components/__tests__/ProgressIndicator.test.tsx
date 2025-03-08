@@ -33,6 +33,9 @@ describe('ProgressIndicator', () => {
 
     render(<ProgressIndicator currentState="recording" />)
     expect(screen.getByText('recording')).toBeInTheDocument()
+    
+    render(<ProgressIndicator currentState="thankyou" />)
+    expect(screen.getByText('Thank You')).toBeInTheDocument()
   })
 
   it('correctly customizes the steps displayed', () => {
