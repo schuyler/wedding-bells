@@ -314,7 +314,7 @@ export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderPr
                   onClick={startRecording}
                   className="bg-wedding-light hover:bg-white text-wedding-dark font-medium py-2 px-6 rounded-sm tracking-wedding uppercase transition-colors"
                 >
-                  Start Recording
+                  Record
                 </button>
                 <button
                   onClick={onCancel}
@@ -347,7 +347,7 @@ export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderPr
                   }}
                   className="bg-wedding-light hover:bg-white text-wedding-dark font-medium py-2 px-6 rounded-sm tracking-wedding uppercase transition-colors"
                 >
-                  Finish Recording
+                  Finish
                 </button>
               </>
             )}

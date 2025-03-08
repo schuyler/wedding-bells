@@ -150,7 +150,8 @@ export function WelcomeForm({ onSubmit, defaultValues }: WelcomeFormProps) {
           Record a message for the wedding podcast
         </h2>
         <p className="text-wedding-light/80 font-eb-garamond">
-          Share your favorite memory, well wishes, or advice for the newlyweds!
+          Your message can be silly, snarky, sentimental, sweet, or all of the above. It doesn't have to be perfect -- please just be yourself!
+          Meessages can be up to 15 minutes long, but you can record as many as you like.
         </p>
       </div>
 

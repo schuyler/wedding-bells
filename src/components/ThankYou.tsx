@@ -98,7 +98,7 @@ export function ThankYou({ guestName, onRecordAnother }: ThankYouProps) {
           Thank You, {guestName}!
         </h2>
         <p className="text-wedding-light/80 font-eb-garamond">
-          Your message has been recorded and will be cherished by Marc & Sea.
+          Your message has been saved and will be reviewed for the wedding podcast.
         </p>
       </div>
 
@@ -131,7 +131,7 @@ export function ThankYou({ guestName, onRecordAnother }: ThankYouProps) {
       </div>
 
       <p className="text-sm text-wedding-light/60 font-eb-garamond">
-        Want to view all messages? Check back after the wedding!
+        Want to hear all the messages? Stay tuned for a link to the podcast!
       </p>
     </div>
   )

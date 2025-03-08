@@ -174,7 +174,7 @@ describe('AudioRecorder', () => {
     )
     
     await act(async () => {
-      fireEvent.click(screen.getByText('Start Recording'))
+      fireEvent.click(screen.getByText('Record'))
     })
     
     expect(mockUserMedia).toHaveBeenCalledWith({
@@ -319,7 +319,7 @@ describe('AudioRecorder', () => {
 
     // Start recording
     await act(async () => {
-      fireEvent.click(screen.getByText('Start Recording'))
+      fireEvent.click(screen.getByText('Record'))
     })
 
     // Pause recording
