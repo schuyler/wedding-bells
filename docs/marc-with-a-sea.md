@@ -1,8 +1,3 @@
----
-tokens: 1136
-type: plan
-atomic: true
----
 
 # Marc With A Sea Wedding Website
 
@@ -235,8 +230,7 @@ This approach ensures that users can navigate back and forth between recording a
     - [ ] Test on mobile devices
   - [ ] Test performance with long recordings
   - [ ] Document test results and issues
-  - [ ] Fix audio format in WaveformVisualizer (change from webm to WAV)
-  - [x] Add performance improvements (memoization) to WaveformVisualizer after backend integration
+  - [x] Add performance improvements (memoization) to AudioRecorderControl
 
 - [ ] Complete Phase 4: Backend Integration
   - [ ] Create upload Worker
@@ -274,6 +268,6 @@ This approach ensures that users can navigate back and forth between recording a
 
 ## Links
 - [Back to Index](index.md)
-- [Technical Details](marc-with-a-sea-technical.md)
-- [Architecture](marc-with-a-sea-architecture.md)
-- [Development Progress](marc-with-a-sea-progress.md)
+- [Technical Architecture](technical-architecture.md)
+- [State Management](state-management.md)
+- [Worker Deployment](worker-deployment.md)
