@@ -11,25 +11,26 @@ vi.mock('../../context/RecordingContext', () => ({
 // Mock the UploadProgress component
 vi.mock('../../components/UploadProgress', () => ({
   UploadProgress: ({ 
-    fileName, 
     progress, 
     status, 
     error, 
     onRetry, 
-    onComplete 
+    onComplete,
+    retryAttempt
   }: { 
-    fileName: string, 
     progress: number,
     status: string,
     error?: string,
     onRetry?: () => void,
-    onComplete?: () => void 
+    onComplete?: () => void,
+    retryAttempt?: number
   }) => (
     <div data-testid="upload-progress">
-      <div data-testid="file-name">{fileName}</div>
+      <div data-testid="file-name"></div>
       <div data-testid="progress">{progress}</div>
       <div data-testid="status">{status}</div>
       {error && <div data-testid="error">{error}</div>}
+      {retryAttempt && <div data-testid="retry-attempt">{retryAttempt}</div>}
       {status === 'error' && onRetry && <button onClick={onRetry}>Retry</button>}
       {status === 'completed' && <button onClick={onComplete}>Complete</button>}
     </div>
@@ -63,14 +64,16 @@ describe('UploadView', () => {
     expect(mockStartUpload).toHaveBeenCalledTimes(1);
   });
   
-  it('uses guest name for file name when available', () => {
+  it('starts upload when idle', () => {
     render(<UploadView />);
     
-    // Verify that the file name includes the guest name
-    expect(screen.getByTestId('file-name').textContent).toBe("Test User's Message.wav");
+    // This was previously checking filename which is no longer displayed
+    // Now we just verify that the component loaded and started upload
+    expect(screen.getByTestId('upload-progress')).toBeInTheDocument();
+    expect(mockStartUpload).toHaveBeenCalledTimes(1);
   });
   
-  it('uses default file name when guest info is missing', () => {
+  it('works without guest info', () => {
     // Mock the useRecording hook without guest info
     (useRecording as any).mockReturnValue({
       guestInfo: null,
@@ -84,8 +87,9 @@ describe('UploadView', () => {
     
     render(<UploadView />);
     
-    // Verify that the default file name is used
-    expect(screen.getByTestId('file-name').textContent).toBe('Recording.wav');
+    // This was previously checking filename which is no longer displayed
+    // Now we just verify that the component loaded
+    expect(screen.getByTestId('upload-progress')).toBeInTheDocument();
   });
   
   it('displays the current upload status and progress', () => {

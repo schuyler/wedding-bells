@@ -17,7 +17,6 @@ import { useRecording } from '../context/RecordingContext';
  */
 export function UploadView() {
   const { 
-    guestInfo, 
     goToNextStep, 
     uploadProgress, 
     uploadStatus, 
@@ -42,7 +41,6 @@ export function UploadView() {
     
   return (
     <UploadProgress
-      fileName={guestInfo ? `${guestInfo.name}'s Message.wav` : 'Recording.wav'}
       progress={uploadProgress}
       status={uploadStatus}
       error={uploadError || undefined}

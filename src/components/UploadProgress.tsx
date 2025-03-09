@@ -8,7 +8,7 @@ import { ErrorModal } from './ErrorModal'
  * Defines the essential properties needed to display and manage the upload process
  * state within the application's recording flow.
  * 
- * @property fileName - The name of the file being uploaded (displayed to the user)
+ * REMOVED: fileName - Was previously displayed but no longer used
  * @property progress - Numeric value between 0-100 representing upload completion percentage
  * @property status - Current state of the upload process (idle, uploading, completed, error)
  * @property error - Optional error message to display when status is 'error'
@@ -16,7 +16,6 @@ import { ErrorModal } from './ErrorModal'
  * @property onComplete - Optional callback function triggered when upload is complete
  */
 interface UploadProgressProps {
-  fileName: string
   progress: number
   status: 'idle' | 'uploading' | 'completed' | 'error'
   error?: string
@@ -39,7 +38,7 @@ interface UploadProgressProps {
  * - On error, displays error modal with retry option if onRetry is provided
  * 
  * Key features:
- * - Displays the file name and current upload status
+ * - Displays the current upload status
  * - Shows visual progress via the ProgressBar component
  * - Provides error handling through ErrorModal for failed uploads
  * - Conditionally renders a continue button when upload is complete
@@ -72,7 +71,6 @@ interface UploadProgressProps {
  * - Make status messages configurable via props for easier customization
  */
 export function UploadProgress({
-  fileName,
   progress,
   status,
   error,
@@ -84,7 +82,7 @@ export function UploadProgress({
    * Determines the appropriate status details based on current upload state.
    * 
    * Returns an object with:
-   * - message: Text to display underneath the filename
+   * - message: Text to display for the current upload status
    * - icon: Visual indicator for the current status (spinner, checkmark, error icon)
    * 
    * This approach centralizes the state-dependent UI elements in one function
