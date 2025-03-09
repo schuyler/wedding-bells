@@ -153,7 +153,7 @@ export function WelcomeForm({ onSubmit, defaultValues }: WelcomeFormProps) {
           Tell us your favorite story, or share your wishes for the couple. You can be silly, snarky, sentimental, sweet, or all of the above &ndash; please be yourself!
         </p>
         <p className="text-wedding-light/80 font-eb-garamond mx-auto w-4/5 text-pretty">
-          Record as many messages as you like. We'll listen to them all and pick our favorites to include in the podcast.
+          Record as many messages as you like. We'll listen to them all and pick our favorite parts to include in the podcast.
         </p>
       </div>
 
