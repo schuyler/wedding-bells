@@ -1,6 +1,87 @@
 import { useState, useCallback, useEffect } from 'react';
 import { UploadState, DEFAULT_UPLOAD_CONFIG, UploadConfig } from '../types';
 
+/**
+ * Network/device capability detection for optimized upload configuration
+ * 
+ * Returns optimized upload settings based on device type and connection quality
+ */
+/**
+ * Represents retry strategy options for uploads
+ */
+type RetryStrategy = 'linear' | 'exponential';
+
+/**
+ * Configuration object returned by capability detection
+ */
+interface UploadCapabilityConfig {
+  timeoutMs: number;
+  maxRetries: number;
+  retryStrategy: RetryStrategy;
+}
+
+function getUploadConfigForClient(): UploadCapabilityConfig {
+  // Define connection info types for better TypeScript support
+  interface ConnectionInfo {
+    effectiveType?: string;
+    type?: string;
+    saveData?: boolean;
+  }
+  
+  interface NavigatorWithConnection {
+    connection?: ConnectionInfo;
+    deviceMemory?: number;
+  }
+  
+  // Get connection information if available
+  const nav = navigator as NavigatorWithConnection;
+  const connectionType = nav.connection?.effectiveType || 'unknown';
+  const isMobile = /mobile|android|iphone|ipad|ipod/i.test(navigator.userAgent.toLowerCase());
+  const isLowMemoryDevice = nav.deviceMemory ? nav.deviceMemory < 4 : false;
+  
+  // Log connection details in development mode
+  if (import.meta.env.DEV) {
+    console.log('Client capabilities:', {
+      connectionType,
+      isMobile,
+      memory: nav.deviceMemory || 'unknown',
+      userAgent: navigator.userAgent
+    });
+  }
+  
+  // Default configuration for desktop browsers
+  let timeoutMs = 60000; // 60s timeout
+  let maxRetries = 3;
+  let retryStrategy: RetryStrategy = 'linear';
+  
+  // Detect low-quality connections (anything slower than LTE/4G)
+  const isSlowConnection = ['2g', 'slow-2g', '3g'].includes(connectionType);
+  
+  // Adjust settings based on device capabilities and connection quality
+  
+  // Set timeout based on connection quality
+  if (connectionType === 'slow-2g' || connectionType === '2g') {
+    timeoutMs = 120000; // 120s for very slow connections
+  } else if (connectionType === '3g' || (isMobile && connectionType === 'unknown')) {
+    timeoutMs = 90000;  // 90s for medium-speed mobile connections
+  } else if (isMobile) {
+    timeoutMs = 75000;  // 75s for faster mobile connections
+  }
+  
+  // Set retry strategy based on connection and device
+  if (isSlowConnection || isLowMemoryDevice) {
+    retryStrategy = 'exponential';
+    // Increase retries for poor connections if not already high
+    maxRetries = Math.max(maxRetries, 4);
+  }
+  
+  return {
+    timeoutMs,
+    maxRetries,
+    retryStrategy
+  };
+}
+
 interface UploadOptions {
   apiUrl?: string;
   uploadToken?: string;
@@ -157,15 +238,9 @@ export function useUpload(options: UploadOptions = {}) {
       // Initialize progress to 10% - this represents the upload starting
       setUploadState({ status: 'uploading', progress: 10 });
       
-      // Set up iOS Safari specific handling
-      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      // Get upload configuration based on client capabilities
+      const { timeoutMs, maxRetries, retryStrategy } = getUploadConfigForClient();
       
-      // Setup longer timeout for iOS Safari (90 seconds)
-      const timeoutMs = (isIOS && isSafari) ? 90000 : 60000;
-      
-      // For iOS Safari, we'll retry uploads instead of just aborting
-      const maxRetries = 3;
       let retryCount = 0;
       let retryTimeoutId: number | null = null;
       
@@ -214,8 +289,8 @@ export function useUpload(options: UploadOptions = {}) {
           // Clear the timeout
           if (retryTimeoutId) clearTimeout(retryTimeoutId);
           
-          // If we still have retries left, try again
-          if (retryCount < maxRetries && (isIOS && isSafari) && !controller.signal.aborted) {
+          // If we still have retries left and haven't been aborted, try again
+          if (retryCount < maxRetries && !controller.signal.aborted) {
             retryCount++;
             
             // Update progress to show retry attempt
@@ -227,53 +302,36 @@ export function useUpload(options: UploadOptions = {}) {
             
             console.log(`Upload attempt ${retryCount}/${maxRetries} failed, retrying...`);
             
-            // Wait before retrying (increasing delay with each retry)
-            const retryDelay = 2000 * retryCount; // 2s, 4s, 6s
+            // Calculate delay based on configured retry strategy
+            let retryDelay: number;
+            
+            if (retryStrategy === 'exponential') {
+              // Exponential backoff: 2s, 4s, 8s (max 10s)
+              retryDelay = Math.min(1000 * Math.pow(2, retryCount), 10000);
+            } else {
+              // Linear backoff: 2s, 4s, 6s
+              retryDelay = 2000 * retryCount;
+            }
+            
+            // Log retry information in development
+            if (import.meta.env.DEV) {
+              console.log(`Retry ${retryCount}/${maxRetries} with ${retryStrategy} strategy (${retryDelay}ms delay)`);
+            }
+            
             await new Promise(resolve => setTimeout(resolve, retryDelay));
             
             // Retry the upload
             return attemptUploadWithRetry();
           }
           
-          // If we're out of retries or it's not iOS Safari, propagate the error
+          // If we're out of retries, propagate the error
           throw error;
         }
       };
       
-      // Call our retry-enabled upload function
-      if (isIOS && isSafari) {
-        // Use the retry-enabled upload for iOS Safari
-        return await attemptUploadWithRetry();
-      } else {
-        // For other browsers, use the standard upload
-        const response = await fetch(uploadUrl.toString(), {
-          method: 'POST',
-          body: formData,
-          signal: controller.signal,
-          headers: {
-            'X-Upload-Token': config.uploadToken
-          },
-        });
-        
-        // Update progress to 90% after server receives the file
-        setUploadState({ status: 'uploading', progress: 90 });
-        
-        // Parse the response
-        const result = await response.json();
-        
-        // Check if the upload was successful
-        if (!response.ok || !result.success) {
-          throw new Error(result.error || 'Upload failed');
-        }
-        
-        // Set state to completed with 100% progress
-        setUploadState({ status: 'completed', progress: 100 });
-        
-        // Add a small delay to ensure progress bar animation completes
-        await new Promise(resolve => setTimeout(resolve, 600));
-        
-        return result;
-      }
+      // Call our retry-enabled upload function for all clients
+      // Use different retry strategies based on client capabilities
+      return await attemptUploadWithRetry();
     } catch (error) {
       if (controller.signal.aborted) {
         // If aborted, just return without updating state

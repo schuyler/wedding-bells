@@ -198,21 +198,32 @@ export const AudioRecorderControl = forwardRef<AudioRecorderControls, AudioRecor
         setChunkCount(0);
         setTotalDataSize(0);
 
-        // Setup MediaRecorder with appropriate MIME type based on browser support
-        let mimeType = 'audio/webm';
+        // Determine the best supported audio format based on capability detection
+        let mimeType = '';
+
+        // Prioritized list of MIME types to try
+        const supportedMimeTypes = [
+          'audio/webm;codecs=opus',  // Best quality, widely supported in modern browsers
+          'audio/webm',              // Good fallback for Chrome, Firefox, Edge
+          'audio/mp4',               // Safari support
+          'audio/aac',               // Another option for Safari 
+          'audio/ogg;codecs=opus',   // Alternative for some browsers
+          ''                         // Empty string as last resort (browser default)
+        ];
         
-        // Check if MediaRecorder has isTypeSupported method (for testing environments)
+        // Find the first supported MIME type
         if (typeof MediaRecorder.isTypeSupported === 'function') {
-          // Check if the browser supports audio/webm
-          if (!MediaRecorder.isTypeSupported('audio/webm')) {
-            // Try audio/mp4 for Safari
-            if (MediaRecorder.isTypeSupported('audio/mp4')) {
-              mimeType = 'audio/mp4';
-            } else {
-              // Use default MIME type as last resort
-              mimeType = '';
+          for (const type of supportedMimeTypes) {
+            if (!type || MediaRecorder.isTypeSupported(type)) {
+              mimeType = type;
+              break;
             }
           }
+        }
+        
+        // Log the selected MIME type in development
+        if (import.meta.env.DEV) {
+          console.log(`Using MIME type: ${mimeType || 'browser default'}`);
         }
         
         // Create MediaRecorder with detected MIME type

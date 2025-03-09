@@ -22,8 +22,12 @@ describe('useUpload', () => {
   });
 
   it('should update status to uploading and progress when upload starts', async () => {
+    // Force success by setting Math.random to return a value < successRate 
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    
     const { result } = renderHook(() => useUpload({
-      simulationDuration: 1000 // Short duration for testing
+      simulationDuration: 1000, // Short duration for testing
+      simulateSuccessRate: 0.8  // Ensure we test the success path
     }));
     
     // Create a mock file
@@ -52,9 +56,12 @@ describe('useUpload', () => {
       vi.advanceTimersByTime(1000);
     });
     
-    // Check final state (with success rate = 0.9, this should usually complete successfully)
+    // Check final state (with mocked Math.random, this should complete successfully)
     expect(result.current.uploadState.status).toBe('completed');
     expect(result.current.uploadState.progress).toBe(100);
+    
+    // Clean up mock
+    vi.mocked(Math.random).mockRestore();
   });
 
   it('should handle upload errors', async () => {
