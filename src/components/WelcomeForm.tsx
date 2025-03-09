@@ -149,10 +149,10 @@ export function WelcomeForm({ onSubmit, defaultValues }: WelcomeFormProps) {
         <h2 className="text-xl md:text-2xl mb-3">
           Record a message for the podcast
         </h2>
-        <p className="text-wedding-light/80 font-eb-garamond max-w-2xl mx-auto whitespace-normal">
-          Tell us your favorite story, or share your wishes for the couple. You can be silly, snarky, sentimental, sweet, or all of the above -- please just be yourself!
+        <p className="text-wedding-light/80 font-eb-garamond mx-auto w-4/5 text-pretty">
+          Tell us your favorite story, or share your wishes for the couple. You can be silly, snarky, sentimental, sweet, or all of the above &ndash; please be yourself!
         </p>
-        <p className="text-wedding-light/80 font-eb-garamond max-w-2xl mx-auto whitespace-normal">
+        <p className="text-wedding-light/80 font-eb-garamond mx-auto w-4/5 text-pretty">
           Record as many messages as you like. We'll listen to them all and pick our favorites to include in the podcast.
         </p>
       </div>
@@ -198,7 +198,7 @@ export function WelcomeForm({ onSubmit, defaultValues }: WelcomeFormProps) {
         </button>
       </form>
 
-      <p className="text-sm text-wedding-light/70 text-center font-eb-garamond max-w-2xl mx-auto whitespace-normal">
+      <p className="text-sm text-wedding-light/70 text-center font-eb-garamond mx-auto w-4/5 text-pretty">
         You'll have up to 15 minutes to record your message
       </p>
 
