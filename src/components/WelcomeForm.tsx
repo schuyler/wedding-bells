@@ -145,15 +145,15 @@ export function WelcomeForm({ onSubmit, defaultValues }: WelcomeFormProps) {
         <BrowserCheck onCompatibilityChange={handleCompatibilityChange} />
       )}
 
-      <div className="text-center">
+      <div className="text-center space-y-2">
         <h2 className="text-xl md:text-2xl mb-3">
-          Record a message for the wedding podcast
+          Record a message for the podcast
         </h2>
         <p className="text-wedding-light/80 font-eb-garamond">
-          Tell a favorite story, or share your wishes for the couple. You can be silly, snarky, sentimental, sweet, or all of the above. It doesn't have to be perfect -- please just be yourself!
+          Tell us your favorite story, or share your wishes for the couple. You can be silly, snarky, sentimental, sweet, or all of the above -- please just be yourself!
         </p>
         <p className="text-wedding-light/80 font-eb-garamond">
-          You can record as many times as you like! We'll listen to them all and pick our favorites to include in the podcast.
+          Record as many messages as you like. We'll listen to them all and pick our favorites to include in the podcast.
         </p>
       </div>
 

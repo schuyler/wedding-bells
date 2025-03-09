@@ -161,7 +161,7 @@ describe('AudioRecorder', () => {
       />
     )
     expect(screen.getByText('READY TO RECORD')).toBeInTheDocument()
-    expect(screen.getByText('Click start when you are ready')).toBeInTheDocument()
+    expect(screen.getByText('Click record when you are ready')).toBeInTheDocument()
   })
 
   // Test permission handling

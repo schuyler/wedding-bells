@@ -267,7 +267,7 @@ export function AudioRecorder({ onRecordingComplete, onCancel }: AudioRecorderPr
               ? isPaused
                 ? 'Recording paused'
                 : 'Speak clearly into your microphone'
-              : 'Click start when you are ready'}
+              : 'Click record when you are ready'}
           </p>
         </div>
 
