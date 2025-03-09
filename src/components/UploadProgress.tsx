@@ -13,14 +13,13 @@ import { ErrorModal } from './ErrorModal'
  * @property status - Current state of the upload process (idle, uploading, completed, error)
  * @property error - Optional error message to display when status is 'error'
  * @property onRetry - Optional callback function to retry a failed upload
- * @property onComplete - Optional callback function triggered when upload is complete
+ * REMOVED: onComplete - Automatic progression handled by parent component instead
  */
 interface UploadProgressProps {
   progress: number
   status: 'idle' | 'uploading' | 'completed' | 'error'
   error?: string
   onRetry?: () => void
-  onComplete?: () => void
   retryAttempt?: number
 }
 
@@ -33,21 +32,21 @@ interface UploadProgressProps {
  *
  * Application Flow Integration:
  * - Appears after a user finishes recording their message
- * - When upload completes (progress reaches 100%), shows a continue button
- * - Continue button triggers onComplete callback which transitions to the thank you state
+ * - When upload completes (progress reaches 100%), automatically transitions to thank you state
+ * - Transition handled by parent component via useEffect hook
  * - On error, displays error modal with retry option if onRetry is provided
  * 
  * Key features:
  * - Displays the current upload status
  * - Shows visual progress via the ProgressBar component
  * - Provides error handling through ErrorModal for failed uploads
- * - Conditionally renders a continue button when upload is complete
+ * - No continue button needed - automatic progression when complete
  * - Supports retry functionality for failed uploads
  * 
  * The component changes its appearance based on the current status:
  * - idle: Shows a "Preparing to upload..." message with a spinner
  * - uploading: Displays progress with a blue progress bar
- * - completed: Shows a green progress bar with a checkmark and continue button
+ * - completed: Shows a green progress bar with a checkmark
  * - error: Displays a yellow/warning progress bar and error modal
  * 
  * Implementation notes:
@@ -75,7 +74,6 @@ export function UploadProgress({
   status,
   error,
   onRetry,
-  onComplete,
   retryAttempt
 }: UploadProgressProps) {
   /**
@@ -193,16 +191,6 @@ export function UploadProgress({
         />
       )}
 
-      {status === 'completed' && (
-        <div className="flex justify-end">
-          <button
-            onClick={onComplete}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-          >
-            Continue
-          </button>
-        </div>
-      )}
     </div>
   )
 }

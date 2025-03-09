@@ -54,13 +54,8 @@ describe('UploadProgress Component', () => {
     expect(screen.getAllByText('Upload failed')[0]).toBeInTheDocument();
   });
 
-  it('renders "Continue" button when status is "completed"', () => {
-    render(<UploadProgress progress={100} status="completed" onComplete={() => {}} />)
-    expect(screen.getByText('Continue')).toBeInTheDocument()
-  })
-
-  it('does not render "Continue" button when status is not "completed"', () => {
-    render(<UploadProgress progress={50} status="uploading" />)
+  it('does not render a continue button when completed', () => {
+    render(<UploadProgress progress={100} status="completed" />)
     expect(() => screen.getByText('Continue')).toThrowError()
   })
 
@@ -71,14 +66,5 @@ describe('UploadProgress Component', () => {
       fireEvent.click(screen.getByText('Retry Upload'));
     });
     expect(onRetry).toHaveBeenCalledTimes(1);
-  });
-
-  it('calls onComplete when "Continue" button is clicked', async () => {
-    const onComplete = vi.fn();
-    render(<UploadProgress progress={100} status="completed" onComplete={onComplete} />);
-    await act(async () => {
-      fireEvent.click(screen.getByText('Continue'));
-    });
-    expect(onComplete).toHaveBeenCalledTimes(1);
   });
 });

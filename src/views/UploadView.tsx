@@ -39,13 +39,19 @@ export function UploadView() {
   const { uploadState } = useRecording();
   const retryAttempt = uploadState?.retryAttempt;
     
+  // Auto-advance to next step when upload completes
+  useEffect(() => {
+    if (uploadStatus === 'completed') {
+      goToNextStep();
+    }
+  }, [uploadStatus, goToNextStep]);
+
   return (
     <UploadProgress
       progress={uploadProgress}
       status={uploadStatus}
       error={uploadError || undefined}
       onRetry={() => retryUpload()}
-      onComplete={goToNextStep}
       retryAttempt={retryAttempt}
     />
   );

@@ -15,14 +15,12 @@ vi.mock('../../components/UploadProgress', () => ({
     status, 
     error, 
     onRetry, 
-    onComplete,
     retryAttempt
   }: { 
     progress: number,
     status: string,
     error?: string,
     onRetry?: () => void,
-    onComplete?: () => void,
     retryAttempt?: number
   }) => (
     <div data-testid="upload-progress">
@@ -32,7 +30,6 @@ vi.mock('../../components/UploadProgress', () => ({
       {error && <div data-testid="error">{error}</div>}
       {retryAttempt && <div data-testid="retry-attempt">{retryAttempt}</div>}
       {status === 'error' && onRetry && <button onClick={onRetry}>Retry</button>}
-      {status === 'completed' && <button onClick={onComplete}>Complete</button>}
     </div>
   ),
 }));
@@ -133,7 +130,7 @@ describe('UploadView', () => {
     expect(mockRetryUpload).toHaveBeenCalledTimes(1);
   });
   
-  it('navigates to next step on upload completion', () => {
+  it('automatically navigates to next step on upload completion', () => {
     // Mock the useRecording hook with completed state
     (useRecording as any).mockReturnValue({
       guestInfo: { name: 'Test User' },
@@ -142,15 +139,13 @@ describe('UploadView', () => {
       uploadError: null,
       startUpload: mockStartUpload,
       retryUpload: mockRetryUpload,
-      goToNextStep: mockGoToNextStep
+      goToNextStep: mockGoToNextStep,
+      uploadState: {}
     });
     
     render(<UploadView />);
     
-    // Simulate upload completion
-    screen.getByText('Complete').click();
-    
-    // Verify that goToNextStep was called
+    // Verify that goToNextStep was called automatically via useEffect
     expect(mockGoToNextStep).toHaveBeenCalled();
   });
 });
