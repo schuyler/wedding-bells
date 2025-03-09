@@ -7,9 +7,9 @@ describe('UploadProgress Component', () => {
     render(<UploadProgress fileName="test.txt" progress={0} status="idle" />)
   })
 
-  it('renders file name correctly', () => {
+  it('does not display filename directly', () => {
     render(<UploadProgress fileName="test.txt" progress={0} status="idle" />)
-    expect(screen.getByText('test.txt')).toBeInTheDocument()
+    expect(screen.queryByText('test.txt')).not.toBeInTheDocument()
   })
 
   it('renders correct status message and icon for each state (idle, uploading, completed, error)', async () => {

@@ -206,6 +206,9 @@ export function useUpload(options: UploadOptions = {}) {
           // Set state to completed with 100% progress
           setUploadState({ status: 'completed', progress: 100 });
           
+          // Add a small delay to ensure progress bar animation completes
+          await new Promise(resolve => setTimeout(resolve, 600));
+          
           return result;
         } catch (error) {
           // Clear the timeout
@@ -265,6 +268,9 @@ export function useUpload(options: UploadOptions = {}) {
         
         // Set state to completed with 100% progress
         setUploadState({ status: 'completed', progress: 100 });
+        
+        // Add a small delay to ensure progress bar animation completes
+        await new Promise(resolve => setTimeout(resolve, 600));
         
         return result;
       }
