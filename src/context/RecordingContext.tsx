@@ -15,6 +15,12 @@ interface RecordingContextType {
   uploadProgress: number;
   uploadStatus: UploadStatus;
   uploadError: string | null;
+  uploadState: { 
+    status: UploadStatus; 
+    progress: number; 
+    error?: Error;
+    retryAttempt?: number;
+  };
   goToNextStep: () => void;
   goToPreviousStep: () => void;
   setGuestInfo: (info: GuestInfo) => void;
@@ -171,6 +177,7 @@ export const RecordingProvider = ({ children }: { children: ReactNode }) => {
       uploadProgress,
       uploadStatus,
       uploadError,
+      uploadState, // Add the complete uploadState object
       goToNextStep,
       goToPreviousStep,
       setGuestInfo,

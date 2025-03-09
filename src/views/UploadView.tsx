@@ -36,6 +36,10 @@ export function UploadView() {
     }
   }, [uploadStatus, startUpload]);
 
+  // Extract retryAttempt from uploadState if available
+  const { uploadState } = useRecording();
+  const retryAttempt = uploadState?.retryAttempt;
+    
   return (
     <UploadProgress
       fileName={guestInfo ? `${guestInfo.name}'s Message.wav` : 'Recording.wav'}
@@ -44,6 +48,7 @@ export function UploadView() {
       error={uploadError || undefined}
       onRetry={() => retryUpload()}
       onComplete={goToNextStep}
+      retryAttempt={retryAttempt}
     />
   );
 }

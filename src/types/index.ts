@@ -56,6 +56,7 @@ export interface UploadState {
   status: 'idle' | 'uploading' | 'completed' | 'error'
   progress: number
   error?: Error
+  retryAttempt?: number
 }
 
 export interface UploadConfig {

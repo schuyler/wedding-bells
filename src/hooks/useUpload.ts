@@ -82,7 +82,7 @@ export function useUpload(options: UploadOptions = {}) {
   /**
    * Creates a FormData object with the file and metadata
    */
-  const createFormData = useCallback((file: Blob, metadata?: Record<string, any>) => {
+  const createFormData = useCallback((file: Blob, metadata?: Record<string, string | number>) => {
     const formData = new FormData();
     formData.append('audio', file);
     
@@ -96,7 +96,7 @@ export function useUpload(options: UploadOptions = {}) {
   /**
    * Simulates upload progress with updates over time
    */
-  const simulateUpload = useCallback((controller: AbortController, resolve: (value?: any) => void, reject: (error: Error) => void) => {
+  const simulateUpload = useCallback((controller: AbortController, resolve: (value?: unknown) => void, reject: (error: Error) => void) => {
     const startTime = Date.now();
     const totalDuration = simulationSettings.duration;
     
@@ -142,7 +142,7 @@ export function useUpload(options: UploadOptions = {}) {
    */
   const performRealUpload = useCallback(async (
     file: Blob, 
-    metadata: Record<string, any> | undefined, 
+    metadata: Record<string, string | number> | undefined, 
     controller: AbortController
   ) => {
     try {
@@ -157,42 +157,143 @@ export function useUpload(options: UploadOptions = {}) {
       // Initialize progress to 10% - this represents the upload starting
       setUploadState({ status: 'uploading', progress: 10 });
       
-      // Make the fetch request with the form data
-      const response = await fetch(uploadUrl.toString(), {
-        method: 'POST',
-        body: formData,
-        signal: controller.signal,
-        headers: {
-          'X-Upload-Token': config.uploadToken
-        },
-      });
+      // Set up iOS Safari specific handling
+      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
       
-      // Set progress to 90% after server receives the file
-      setUploadState({ status: 'uploading', progress: 90 });
+      // Setup longer timeout for iOS Safari (90 seconds)
+      const timeoutMs = (isIOS && isSafari) ? 90000 : 60000;
       
-      // Parse the response
-      const result = await response.json();
+      // For iOS Safari, we'll retry uploads instead of just aborting
+      const maxRetries = 3;
+      let retryCount = 0;
+      let retryTimeoutId: number | null = null;
       
-      // Check if the upload was successful
-      if (!response.ok || !result.success) {
-        throw new Error(result.error || 'Upload failed');
+      // Create a function to handle uploading with retries
+      const attemptUploadWithRetry = async (): Promise<unknown> => {
+        try {
+          // Make the fetch request with the form data
+          const response = await Promise.race([
+            fetch(uploadUrl.toString(), {
+              method: 'POST',
+              body: formData,
+              signal: controller.signal,
+              headers: {
+                'X-Upload-Token': config.uploadToken
+              },
+            }),
+            new Promise<Response>((_, reject) => {
+              retryTimeoutId = window.setTimeout(() => {
+                reject(new Error('Upload request timed out'));
+              }, timeoutMs);
+            })
+          ]);
+          
+          // Clear timeout since we got a response
+          if (retryTimeoutId) clearTimeout(retryTimeoutId);
+          
+          // Update progress to 90% after server receives the file
+          setUploadState({ status: 'uploading', progress: 90 });
+          
+          // Parse the response
+          const result = await response.json();
+          
+          // Check if the upload was successful
+          if (!response.ok || !result.success) {
+            throw new Error(result.error || 'Upload failed');
+          }
+          
+          // Set state to completed with 100% progress
+          setUploadState({ status: 'completed', progress: 100 });
+          
+          return result;
+        } catch (error) {
+          // Clear the timeout
+          if (retryTimeoutId) clearTimeout(retryTimeoutId);
+          
+          // If we still have retries left, try again
+          if (retryCount < maxRetries && (isIOS && isSafari) && !controller.signal.aborted) {
+            retryCount++;
+            
+            // Update progress to show retry attempt
+            setUploadState({ 
+              status: 'uploading', 
+              progress: 10 + (retryCount * 5), // Increment progress slightly with each retry
+              retryAttempt: retryCount
+            });
+            
+            console.log(`Upload attempt ${retryCount}/${maxRetries} failed, retrying...`);
+            
+            // Wait before retrying (increasing delay with each retry)
+            const retryDelay = 2000 * retryCount; // 2s, 4s, 6s
+            await new Promise(resolve => setTimeout(resolve, retryDelay));
+            
+            // Retry the upload
+            return attemptUploadWithRetry();
+          }
+          
+          // If we're out of retries or it's not iOS Safari, propagate the error
+          throw error;
+        }
+      };
+      
+      // Call our retry-enabled upload function
+      if (isIOS && isSafari) {
+        // Use the retry-enabled upload for iOS Safari
+        return await attemptUploadWithRetry();
+      } else {
+        // For other browsers, use the standard upload
+        const response = await fetch(uploadUrl.toString(), {
+          method: 'POST',
+          body: formData,
+          signal: controller.signal,
+          headers: {
+            'X-Upload-Token': config.uploadToken
+          },
+        });
+        
+        // Update progress to 90% after server receives the file
+        setUploadState({ status: 'uploading', progress: 90 });
+        
+        // Parse the response
+        const result = await response.json();
+        
+        // Check if the upload was successful
+        if (!response.ok || !result.success) {
+          throw new Error(result.error || 'Upload failed');
+        }
+        
+        // Set state to completed with 100% progress
+        setUploadState({ status: 'completed', progress: 100 });
+        
+        return result;
       }
-      
-      // Set state to completed with 100% progress
-      setUploadState({ status: 'completed', progress: 100 });
-      
-      return result;
     } catch (error) {
       if (controller.signal.aborted) {
         // If aborted, just return without updating state
         return;
       }
       
+      // Provide more specific error messages for network issues
+      let errorMessage = 'Unknown upload error';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        
+        // Improve error messages for common network issues
+        if (error.name === 'AbortError') {
+          errorMessage = 'Upload timed out. Please try again with a better connection.';
+        } else if (error.message.includes('NetworkError') || error.message.includes('network')) {
+          errorMessage = 'Network error. Please check your connection and try again.';
+        } else if (error.message.includes('timeout') || error.message.includes('timed out')) {
+          errorMessage = 'Upload timed out. Please try again with a better connection.';
+        }
+      }
+      
       // Set error state
       setUploadState({ 
         status: 'error', 
         progress: uploadState.progress,
-        error: error instanceof Error ? error : new Error('Unknown upload error')
+        error: error instanceof Error ? new Error(errorMessage) : new Error(errorMessage)
       });
       
       throw error;
@@ -202,7 +303,7 @@ export function useUpload(options: UploadOptions = {}) {
   /**
    * Start a file upload - real or simulated based on configuration
    */
-  const startUpload = useCallback((file: Blob, metadata?: Record<string, any>) => {
+  const startUpload = useCallback((file: Blob, metadata?: Record<string, string | number>) => {
     // Reset state and clean up any previous upload
     cleanup();
     setUploadState({ status: 'uploading', progress: 0 });
@@ -212,7 +313,7 @@ export function useUpload(options: UploadOptions = {}) {
     setAbortController(controller);
     
     // Return a promise that resolves when upload completes or rejects on error
-    return new Promise<any>((resolve, reject) => {
+    return new Promise<unknown>((resolve, reject) => {
       if (shouldSimulate) {
         // Use simulated upload
         simulateUpload(controller, resolve, reject);
@@ -228,7 +329,7 @@ export function useUpload(options: UploadOptions = {}) {
   /**
    * Retry a failed upload
    */
-  const retryUpload = useCallback((file: Blob, metadata?: Record<string, any>) => {
+  const retryUpload = useCallback((file: Blob, metadata?: Record<string, string | number>) => {
     return startUpload(file, metadata);
   }, [startUpload]);
   
