@@ -23,7 +23,6 @@ interface ProgressIndicatorProps {
  * - Renders a series of dots connected by lines
  * - Colors dots and connecting lines based on progress (completed vs. upcoming)
  * - Shows current step number and total steps
- * - Displays the current step name (with special case for "welcome" → "Get Started")
  * 
  * Opportunities for improvement:
  * 1. Navigation flow:
@@ -36,12 +35,7 @@ interface ProgressIndicatorProps {
  *    - The `states` prop allows customizing steps but doesn't appear to be used
  *    - Consider removing this flexibility if not needed, or document valid variations
  * 
- * 3. Step labeling:
- *    - Step label display is inconsistent ("welcome" → "Get Started")
- *    - Consider a mapping object for all state labels or a getDisplayLabel function
- *    - Example: { welcome: "Get Started", recording: "Record Your Message", ... }
- * 
- * 4. Accessibility:
+ * 3. Accessibility:
  *    - Current implementation lacks proper accessibility attributes
  *    - Consider adding aria-* attributes to identify steps and current progress
  *    - Enhance with keyboard navigation if it becomes interactive
@@ -92,15 +86,6 @@ export function ProgressIndicator({
       {/* Step Counter */}
       <div className="text-xs sm:text-sm text-wedding-light/70 font-eb-garamond tracking-wider">
         STEP {states.indexOf(currentState) + 1} OF {states.length}
-      </div>
-
-      {/* Step Label - Custom transformation for states */}
-      <div className="text-sm sm:text-base font-medium text-wedding-light uppercase tracking-wedding">
-        {currentState === 'welcome' 
-          ? 'Get Started' 
-          : currentState === 'thankyou'
-            ? 'Thank You'
-            : currentState}
       </div>
     </div>
   )

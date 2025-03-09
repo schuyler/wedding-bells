@@ -13,34 +13,20 @@ describe('ProgressIndicator', () => {
     expect(steps.length).toBe(3)
   })
 
-  it('highlights the current step', () => {
-    render(<ProgressIndicator currentState="recording" states={['welcome', 'recording', 'upload']} />)
-    const currentStep = screen.getByText('recording')
-    expect(currentStep).toBeInTheDocument()
-  })
-
   it('displays the correct step counter', () => {
-    render(<ProgressIndicator currentState="upload" states={['welcome', 'recording', 'upload', 'thankyou']} />)
-    // Use a function to match text split across multiple elements
-    expect(screen.getByText((_, element) => {
-      return element?.textContent === 'STEP 3 OF 4'
-    })).toBeInTheDocument()
-  })
-
-  it('displays the correct step label', () => {
-    render(<ProgressIndicator currentState="welcome" />)
-    expect(screen.getByText('Get Started')).toBeInTheDocument()
-
-    render(<ProgressIndicator currentState="recording" />)
-    expect(screen.getByText('recording')).toBeInTheDocument()
+    const { container } = render(<ProgressIndicator currentState="upload" states={['welcome', 'recording', 'upload', 'thankyou']} />)
     
-    render(<ProgressIndicator currentState="thankyou" />)
-    expect(screen.getByText('Thank You')).toBeInTheDocument()
+    // Find the step counter element by its class
+    const stepCounter = container.querySelector('.text-xs.sm\\:text-sm.text-wedding-light\\/70');
+    
+    // Check the content - using textContent which combines all text nodes
+    expect(stepCounter).not.toBeNull();
+    expect(stepCounter?.textContent?.replace(/\s+/g, ' ').trim()).toBe('STEP 3 OF 4');
   })
 
   it('correctly customizes the steps displayed', () => {
-    render(<ProgressIndicator currentState="recording" states={['welcome', 'recording', 'upload']} />)
-    const step1 = screen.getByText('recording')
-    expect(step1).toBeInTheDocument()
+    const { container } = render(<ProgressIndicator currentState="recording" states={['welcome', 'recording', 'upload']} />)
+    const steps = container.querySelectorAll('.w-2\\.5')
+    expect(steps.length).toBe(3)
   })
 })
